@@ -1,0 +1,19 @@
+---
+Name: toastconfig
+After: 'framework/*','cms/*'
+---
+SiteConfig:
+  extensions:
+    - ToastConfig
+    - AbandonedCartConfig
+    - SignUpModalConfig
+    - CheckoutStepConfig
+  google_api_key: 'AIzaSyAw1MOYLzorZrTXlsXic0_RSmej7u27gBs'
+
+Order:
+  extensions:
+    - ToastCartExtension
+
+Controller:
+  extensions:
+    - ToastCheckoutExtension

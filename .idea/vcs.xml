@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cms" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/framework" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/googlemapfield" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/gridfieldextensions" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/hasonefield" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/omnipay" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/reports" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/silvershop" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/siteconfig" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/subsites" vcs="Git" />
+  </component>
+</project>

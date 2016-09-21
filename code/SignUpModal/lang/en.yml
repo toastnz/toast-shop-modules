@@ -1,0 +1,8 @@
+---
+en:
+  Toast:
+    SIGNUP_NAME: 'First Name'
+    SIGNUP_EMAIL: 'Email'
+    SIGNUP_BUTTON: 'Sign me up'
+    SIGNUP_NAME_PLACEHOLDER: ''
+    SIGNUP_EMAIL_PLACEHOLDER: ''
