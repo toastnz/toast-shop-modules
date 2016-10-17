@@ -37,7 +37,7 @@ class CheckoutStepConfig extends DataExtension
              * Checkout steps
              * ----------------------------------------*/
 
-            $fields->findOrMakeTab('Root.CDB.CheckoutSteps', 'Checkout Steps');
+            $fields->findOrMakeTab('Root.Toast.CheckoutSteps', 'Checkout Steps');
 
             $enableSteps = CheckboxField::create('EnableCheckoutSteps', 'Enable checkout steps?');
             $enableSteps->addExtraClass('toast-checkbox');
@@ -48,7 +48,7 @@ class CheckoutStepConfig extends DataExtension
             $accessoryStep = CheckboxField::create('AddAccessoriesStep', 'Add accessories step?');
             $accessoryStep->addExtraClass('toast-checkbox');
 
-            $fields->addFieldsToTab('Root.CDB.CheckoutSteps', array(
+            $fields->addFieldsToTab('Root.Toast.CheckoutSteps', array(
                 HeaderField::create('Checkout Steps'),
                 $enableSteps,
                 $warrantyStep,

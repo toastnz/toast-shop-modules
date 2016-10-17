@@ -28,19 +28,6 @@ class ToastConfig extends DataExtension
                 $fields->addFieldToTab('Root', TabSet::create('Toast', 'Shop Settings'));
             }
         }
-
-        /** -----------------------------------------
-         * Misc
-         * ----------------------------------------*/
-
-        $styles = <<<CSS
-.toast-checkbox.field.checkbox,
-.toast-checkbox{
-    padding-left: 0 !important;
-}
-CSS;
-
-        Requirements::customCSS($styles, 'ToastCMSStyles');
     }
 
 }

@@ -16,7 +16,7 @@ class ToastCartExtension extends DataExtension
          * @var SignUpMessage $record
          * ========================================*/
 
-        if ($recordID = Session::get('CDB.SignUpRecord')) {
+        if ($recordID = Session::get('Toast.SignUpRecord')) {
             $record = SignUpMessage::get()->byID($recordID);
             if ($record && $record->exists()) {
                 $record->setField('CartID', $this->owner->ID);
@@ -64,7 +64,7 @@ class ToastCartExtension extends DataExtension
         }
 
         if ($this->owner->Status == 'Cart') {
-            if ($recordID = Session::get('CDB.SignUpRecord')) {
+            if ($recordID = Session::get('Toast.SignUpRecord')) {
                 $record = SignUpMessage::get()->byID($recordID);
                 if ($record && $record->exists()) {
                     $record->setField('CartID', $this->owner->ID);
