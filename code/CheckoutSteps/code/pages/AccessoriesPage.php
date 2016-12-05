@@ -33,39 +33,6 @@ class AccessoriesPage extends ProductCategory
 
         return $fields;
     }
-
-    public function requireDefaultRecords()
-    {
-        /** =========================================
-         * @var AccessoriesPage $page
-         * ========================================*/
-
-        parent::requireDefaultRecords();
-
-        if (!self::get()->exists() && $this->config()->create_default_pages) {
-
-            $checkout = CheckoutPage::get()->first();
-            if (!$checkout) {
-                $singleton = singleton('CheckoutPage');
-                $singleton->requireDefaultRecords();
-                $checkout = CheckoutPage::get()->first();
-            }
-
-            $page = self::create(
-                array(
-                    'Title' => 'Accessories',
-                    'URLSegment' => 'accessories',
-                    'ShowInMenus' => 0,
-                    'ParentID' => $checkout->ID
-                )
-            );
-
-            $page->write();
-            $page->publish('Stage', 'Live');
-            $page->flushCache();
-            DB::alteration_message('Accessories Page created', 'created');
-        }
-    }
 }
 
 /**
