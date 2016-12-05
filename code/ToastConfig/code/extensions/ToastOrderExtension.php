@@ -72,6 +72,16 @@ class ToastCartExtension extends DataExtension
                         $record->write();
                     }
                 }
+            } elseif ($this->owner->Email) {
+                $record = SignUpMessage::create([
+                    'Email' => $this->owner->Email,
+                    'Name' => $this->owner->FirstName,
+                    'Status' => 'New',
+                    'CartID' => $this->owner->ID
+                ]);
+                $recordID = $record->write();
+
+                Session::set('Toast.SignUpRecord', $recordID);
             }
         }
     }
