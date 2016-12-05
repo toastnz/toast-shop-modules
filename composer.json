@@ -22,9 +22,8 @@
     ],
     "require": {
         "composer/installers": "*",
-        "silverstripe/cms": ">=3.0.1,<3.4",
-        "silverstripe/framework": ">=3.0.1,<3.4",
-        "silverstripe/subsites": "^1.3",
+        "silverstripe/cms": "~3.1",
+        "silverstripe/framework": "~3.1",
         "silvershop/discounts": "^1.2",
         "silvershop/shipping": "^0.2.1",
         "silvershop/core": "^2.0"
