@@ -23,8 +23,6 @@ class ToastCheckoutExtension extends Extension
 
     public function onBeforeInit()
     {
-        $key = Config::inst()->get('SiteConfig', 'google_api_key');
-        Requirements::javascript('https://maps.googleapis.com/maps/api/js?key=' . $key);
         Requirements::javascript(Controller::join_links(TOAST_MODULES_DIR,  'toast-shop-modules/javascript/toast-shop.js'));
     }
 }
