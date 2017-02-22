@@ -20,9 +20,4 @@ class ToastCheckoutExtension extends Extension
 
         return CheckoutPage::find_link();
     }
-
-    public function onBeforeInit()
-    {
-        Requirements::javascript(Controller::join_links(TOAST_MODULES_DIR,  'toast-shop-modules/javascript/toast-shop.js'));
-    }
 }

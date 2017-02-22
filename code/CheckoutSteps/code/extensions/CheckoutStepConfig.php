@@ -3,17 +3,16 @@
 /**
  * Class CheckoutStepConfig
  *
- * @property bool AddWarrantyStep
- * @property bool AddAccessoriesStep
  * @property bool EnableCheckoutSteps
+ * @property string EnabledSteps
+ * @property SiteConfig|CheckoutStepConfig $owner
  */
 class CheckoutStepConfig extends DataExtension
 {
-    private static $db = array(
+    private static $db = [
         'EnableCheckoutSteps' => 'Boolean',
-        'AddWarrantyStep' => 'Boolean',
-        'AddAccessoriesStep' => 'Boolean'
-    );
+        'EnabledSteps' => 'Varchar'
+    ];
 
     /**
      * @param FieldList $fields
@@ -22,9 +21,9 @@ class CheckoutStepConfig extends DataExtension
     {
         /** =========================================
          * @var HtmlEditorField $content
-         * @var CheckboxField $enableSteps
-         * @var CheckboxField $warrantyStep
-         * @var CheckboxField $accessoryStep
+         * @var CheckboxField   $enableSteps
+         * @var CheckboxField   $warrantyStep
+         * @var CheckboxField   $accessoryStep
         ===========================================*/
 
         if (Permission::check('ADMIN')) {
@@ -39,22 +38,85 @@ class CheckoutStepConfig extends DataExtension
 
             $fields->findOrMakeTab('Root.Toast.CheckoutSteps', 'Checkout Steps');
 
-            $enableSteps = CheckboxField::create('EnableCheckoutSteps', 'Enable checkout steps?');
-            $enableSteps->addExtraClass('toast-checkbox');
-
-            $warrantyStep = CheckboxField::create('AddWarrantyStep', 'Add warranty step?');
-            $warrantyStep->addExtraClass('toast-checkbox');
-
-            $accessoryStep = CheckboxField::create('AddAccessoriesStep', 'Add accessories step?');
-            $accessoryStep->addExtraClass('toast-checkbox');
-
-            $fields->addFieldsToTab('Root.Toast.CheckoutSteps', array(
+            $fields->addFieldsToTab('Root.Toast.CheckoutSteps', [
                 HeaderField::create('Checkout Steps'),
-                $enableSteps,
-                $warrantyStep,
-                $accessoryStep
-            ));
+                CheckboxField::create('EnableCheckoutSteps', 'Enable checkout steps?')
+            ]);
+
+            if ($this->owner->EnableCheckoutSteps) {
+
+                $fields->addFieldsToTab('Root.Toast.CheckoutSteps', [
+                    CheckboxSetField::create('EnabledSteps', 'Enabled checkout steps', [
+                        'Membership'      => 'Membership',
+                        'ContactDetails'  => 'Contact Details',
+                        'ShippingAddress' => 'Shipping Address',
+                        'BillingAddress'  => 'Billing Address',
+                        'ShippingMethod'  => 'Shipping Method',
+                        'PaymentMethod'   => 'Payment Method'
+                    ])
+                ]);
+            }
         }
+    }
+
+    public function onAfterWrite()
+    {
+        parent::onAfterWrite();
+
+        $steps = $this->owner->getStepsArray();
+
+        $configFile = Controller::join_links(Director::baseFolder(), TOAST_MODULES_DIR, '_config/shop_gen.yml');
+
+        $fileHeader = <<<yml
+---
+Name: shopgen
+After: 'framework/*','cms/*'
+---
+yml;
+
+        if (!empty($steps)) {
+            $fullFileContents = <<<yml
+---
+Name: shopgen
+After: 'framework/*','cms/*'
+---
+CheckoutPage:
+  steps:\r
+yml;
+            foreach ($steps as $step => $stepClass) {
+                $fullFileContents .= sprintf("    %s: %s\r", $step, $stepClass);
+            }
+            // Always tack on summary
+            $fullFileContents .= "    summary: CheckoutStep_Summary";
+
+                file_put_contents($configFile, $fullFileContents);
+        } else {
+            file_put_contents($configFile, $fileHeader);
+        }
+    }
+
+    public function getStepsArray()
+    {
+        $list = explode(',', $this->owner->EnabledSteps);
+
+        $steps = [];
+
+        foreach ($list as $step) {
+            if ($step == 'ShippingAddress' || $step == 'BillingAddress') {
+                $steps[strtolower($step)] = 'CheckoutStep_Address';
+                continue;
+            }
+            if (class_exists('CheckoutStep_' . $step)) {
+                $steps[strtolower($step)] = 'CheckoutStep_' . $step;
+            }
+        }
+
+        // Use default steps / config
+        if (empty($steps)) {
+            return null;
+        }
+
+        return $steps;
     }
 
     /**
@@ -65,10 +127,10 @@ class CheckoutStepConfig extends DataExtension
     public function getCheckoutStepList()
     {
         /** =========================================
-         * @var ArrayList $list
-         * @var CartPage $checkout
-         * @var ShippingPage $shipping
-         * @var WarrantyPage $warranty
+         * @var ArrayList       $list
+         * @var CartPage        $checkout
+         * @var ShippingPage    $shipping
+         * @var WarrantyPage    $warranty
          * @var AccessoriesPage $accessories
          * @var ReviewOrderPage $reviewPage
          * ========================================*/
@@ -82,12 +144,12 @@ class CheckoutStepConfig extends DataExtension
         $checkout = CartPage::get()->first();
 
         if ($checkout && $checkout->exists()) {
-            $list->push(ArrayData::create(array(
-                'Title' => $checkout->Title,
-                'MenuTitle' => $checkout->MenuTitle,
+            $list->push(ArrayData::create([
+                'Title'       => $checkout->Title,
+                'MenuTitle'   => $checkout->MenuTitle,
                 'LinkingMode' => $checkout->LinkingMode(),
-                'Link' => $checkout->Link()
-            )));
+                'Link'        => $checkout->Link()
+            ]));
         }
 
         /** -----------------------------------------
@@ -97,12 +159,12 @@ class CheckoutStepConfig extends DataExtension
         $shipping = ShippingPage::get()->first();
 
         if ($shipping && $shipping->exists()) {
-            $list->push(ArrayData::create(array(
-                'Title' => $shipping->Title,
-                'MenuTitle' => $shipping->MenuTitle,
+            $list->push(ArrayData::create([
+                'Title'       => $shipping->Title,
+                'MenuTitle'   => $shipping->MenuTitle,
                 'LinkingMode' => $shipping->LinkingMode(),
-                'Link' => $shipping->Link()
-            )));
+                'Link'        => $shipping->Link()
+            ]));
         }
 
         /** -----------------------------------------
@@ -114,12 +176,12 @@ class CheckoutStepConfig extends DataExtension
             $warranty = WarrantyPage::get()->first();
 
             if ($warranty && $warranty->exists()) {
-                $list->push(ArrayData::create(array(
-                    'Title' => $warranty->Title,
-                    'MenuTitle' => $warranty->MenuTitle,
+                $list->push(ArrayData::create([
+                    'Title'       => $warranty->Title,
+                    'MenuTitle'   => $warranty->MenuTitle,
                     'LinkingMode' => $warranty->LinkingMode(),
-                    'Link' => $warranty->Link()
-                )));
+                    'Link'        => $warranty->Link()
+                ]));
             }
         }
 
@@ -132,12 +194,12 @@ class CheckoutStepConfig extends DataExtension
             $accessories = AccessoriesPage::get()->first();
 
             if ($accessories && $accessories->exists()) {
-                $list->push(ArrayData::create(array(
-                    'Title' => $accessories->Title,
-                    'MenuTitle' => $accessories->MenuTitle,
+                $list->push(ArrayData::create([
+                    'Title'       => $accessories->Title,
+                    'MenuTitle'   => $accessories->MenuTitle,
                     'LinkingMode' => $accessories->LinkingMode(),
-                    'Link' => $accessories->Link()
-                )));
+                    'Link'        => $accessories->Link()
+                ]));
             }
         }
 
@@ -148,12 +210,12 @@ class CheckoutStepConfig extends DataExtension
         $reviewPage = ReviewOrderPage::get()->first();
 
         if ($reviewPage && $reviewPage->exists()) {
-            $list->push(ArrayData::create(array(
-                'Title' => $reviewPage->Title,
-                'MenuTitle' => $reviewPage->MenuTitle,
+            $list->push(ArrayData::create([
+                'Title'       => $reviewPage->Title,
+                'MenuTitle'   => $reviewPage->MenuTitle,
                 'LinkingMode' => $reviewPage->LinkingMode(),
-                'Link' => $reviewPage->Link()
-            )));
+                'Link'        => $reviewPage->Link()
+            ]));
         }
 
         return $list;
