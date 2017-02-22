@@ -3,15 +3,15 @@
 /**
  * Class CheckoutStepConfig
  *
- * @property bool EnableCheckoutSteps
- * @property string EnabledSteps
+ * @property bool                          EnableCheckoutSteps
+ * @property string                        EnabledSteps
  * @property SiteConfig|CheckoutStepConfig $owner
  */
 class CheckoutStepConfig extends DataExtension
 {
     private static $db = [
         'EnableCheckoutSteps' => 'Boolean',
-        'EnabledSteps' => 'Varchar'
+        'EnabledSteps'        => 'Varchar'
     ];
 
     /**
@@ -63,8 +63,6 @@ class CheckoutStepConfig extends DataExtension
     {
         parent::onAfterWrite();
 
-        $steps = $this->owner->getStepsArray();
-
         $configFile = Controller::join_links(Director::baseFolder(), TOAST_MODULES_DIR, '_config/shop_gen.yml');
 
         $fileHeader = <<<yml
@@ -73,9 +71,15 @@ Name: shopgen
 After: 'framework/*','cms/*'
 ---
 yml;
+        file_put_contents($configFile, $fileHeader);
 
-        if (!empty($steps)) {
-            $fullFileContents = <<<yml
+        if ($this->owner->EnableCheckoutSteps) {
+
+            $steps = $this->owner->getStepsArray();
+
+
+            if (!empty($steps)) {
+                $fullFileContents = <<<yml
 ---
 Name: shopgen
 After: 'framework/*','cms/*'
@@ -83,16 +87,17 @@ After: 'framework/*','cms/*'
 CheckoutPage:
   steps:\r
 yml;
-            foreach ($steps as $step => $stepClass) {
-                $fullFileContents .= sprintf("    %s: %s\r", $step, $stepClass);
-            }
-            // Always tack on summary
-            $fullFileContents .= "    summary: CheckoutStep_Summary";
-
+                foreach ($steps as $step => $stepClass) {
+                    $fullFileContents .= sprintf("    %s: %s\r", $step, $stepClass);
+                }
+                // Always tack on summary
+                $fullFileContents .= "    summary: CheckoutStep_Summary";
                 file_put_contents($configFile, $fullFileContents);
-        } else {
-            file_put_contents($configFile, $fileHeader);
+
+            }
         }
+
+        exec('php framework/cli-script.php dev/build');
     }
 
     public function getStepsArray()
