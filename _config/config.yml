@@ -13,6 +13,6 @@ Order:
   extensions:
     - ToastCartExtension
 
-Controller:
+CheckoutPage_Controller:
   extensions:
-    - ToastCheckoutExtension
+    - CheckoutPageControllerExtension

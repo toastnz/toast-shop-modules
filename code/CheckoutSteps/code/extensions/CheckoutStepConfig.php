@@ -73,29 +73,29 @@ After: 'framework/*','cms/*'
 yml;
         file_put_contents($configFile, $fileHeader);
 
-        if ($this->owner->EnableCheckoutSteps) {
-
-            $steps = $this->owner->getStepsArray();
-
-
-            if (!empty($steps)) {
-                $fullFileContents = <<<yml
----
-Name: shopgen
-After: 'framework/*','cms/*'
----
-CheckoutPage:
-  steps:\r
-yml;
-                foreach ($steps as $step => $stepClass) {
-                    $fullFileContents .= sprintf("    %s: %s\r", $step, $stepClass);
-                }
-                // Always tack on summary
-                $fullFileContents .= "    summary: CheckoutStep_Summary";
-                file_put_contents($configFile, $fullFileContents);
-
-            }
-        }
+//        if ($this->owner->EnableCheckoutSteps) {
+//
+//            $steps = $this->owner->getStepsArray();
+//
+//
+//            if (!empty($steps)) {
+//                $fullFileContents = <<<yml
+//---
+//Name: shopgen
+//After: 'framework/*','cms/*'
+//---
+//CheckoutPage:
+//  steps:\r
+//yml;
+//                foreach ($steps as $step => $stepClass) {
+//                    $fullFileContents .= sprintf("    %s: %s\r", $step, $stepClass);
+//                }
+//                // Always tack on summary
+//                $fullFileContents .= "    summary: CheckoutStep_Summary";
+//                file_put_contents($configFile, $fullFileContents);
+//
+//            }
+//        }
 
         exec('php framework/cli-script.php dev/build');
     }
