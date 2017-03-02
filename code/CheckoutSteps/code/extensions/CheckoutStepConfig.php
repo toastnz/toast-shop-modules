@@ -1,4 +1,5 @@
 <?php
+use SilverStripe\Omnipay\GatewayInfo;
 
 /**
  * Class CheckoutStepConfig
@@ -11,7 +12,7 @@ class CheckoutStepConfig extends DataExtension
 {
     private static $db = [
         'EnableCheckoutSteps' => 'Boolean',
-        'EnabledSteps'        => 'Varchar'
+        'EnabledSteps'        => 'Text'
     ];
 
     /**
@@ -48,181 +49,142 @@ class CheckoutStepConfig extends DataExtension
                 $fields->addFieldsToTab('Root.Toast.CheckoutSteps', [
                     CheckboxSetField::create('EnabledSteps', 'Enabled checkout steps', [
                         'Membership'      => 'Membership',
-                        'ContactDetails'  => 'Contact Details',
+                        'CustomerDetails' => 'Contact Details',
                         'ShippingAddress' => 'Shipping Address',
                         'BillingAddress'  => 'Billing Address',
-                        'ShippingMethod'  => 'Shipping Method',
-                        'PaymentMethod'   => 'Payment Method'
+                        'Shipping'        => 'Shipping Method',
+                        'Payment'         => 'Payment Method',
+                        'Notes'           => 'Notes',
+                        'Terms'           => 'Terms and Conditions',
                     ])
                 ]);
             }
         }
     }
+}
 
-    public function onAfterWrite()
-    {
-        parent::onAfterWrite();
-
-        $configFile = Controller::join_links(Director::baseFolder(), TOAST_MODULES_DIR, '_config/shop_gen.yml');
-
-        $fileHeader = <<<yml
----
-Name: shopgen
-After: 'framework/*','cms/*'
----
-yml;
-        file_put_contents($configFile, $fileHeader);
-
-//        if ($this->owner->EnableCheckoutSteps) {
-//
-//            $steps = $this->owner->getStepsArray();
-//
-//
-//            if (!empty($steps)) {
-//                $fullFileContents = <<<yml
-//---
-//Name: shopgen
-//After: 'framework/*','cms/*'
-//---
-//CheckoutPage:
-//  steps:\r
-//yml;
-//                foreach ($steps as $step => $stepClass) {
-//                    $fullFileContents .= sprintf("    %s: %s\r", $step, $stepClass);
-//                }
-//                // Always tack on summary
-//                $fullFileContents .= "    summary: CheckoutStep_Summary";
-//                file_put_contents($configFile, $fullFileContents);
-//
-//            }
-//        }
-
-        exec('php framework/cli-script.php dev/build');
-    }
-
-    public function getStepsArray()
-    {
-        $list = explode(',', $this->owner->EnabledSteps);
-
-        $steps = [];
-
-        foreach ($list as $step) {
-            if ($step == 'ShippingAddress' || $step == 'BillingAddress') {
-                $steps[strtolower($step)] = 'CheckoutStep_Address';
-                continue;
-            }
-            if (class_exists('CheckoutStep_' . $step)) {
-                $steps[strtolower($step)] = 'CheckoutStep_' . $step;
-            }
-        }
-
-        // Use default steps / config
-        if (empty($steps)) {
-            return null;
-        }
-
-        return $steps;
-    }
-
-    /**
-     * Link list for templates
-     *
-     * @return ArrayList
-     */
-    public function getCheckoutStepList()
+/**
+ * Class ToastCheckoutComponentConfig
+ */
+class ToastCheckoutComponentConfig extends CheckoutComponentConfig
+{
+    public function __construct(Order $order)
     {
         /** =========================================
-         * @var ArrayList       $list
-         * @var CartPage        $checkout
-         * @var ShippingPage    $shipping
-         * @var WarrantyPage    $warranty
-         * @var AccessoriesPage $accessories
-         * @var ReviewOrderPage $reviewPage
+         * @var CheckoutStepConfig|SiteConfig $siteConfig
          * ========================================*/
 
-        $list = ArrayList::create();
+        parent::__construct($order);
 
-        /** -----------------------------------------
-         * Cart
-         * ----------------------------------------*/
+        $siteConfig = SiteConfig::current_site_config();
 
-        $checkout = CartPage::get()->first();
+        if ($siteConfig->EnableCheckoutSteps) {
 
-        if ($checkout && $checkout->exists()) {
-            $list->push(ArrayData::create([
-                'Title'       => $checkout->Title,
-                'MenuTitle'   => $checkout->MenuTitle,
-                'LinkingMode' => $checkout->LinkingMode(),
-                'Link'        => $checkout->Link()
-            ]));
-        }
+            $steps = explode(',', $siteConfig->EnabledSteps);
+            $steps = array_filter($steps);
 
-        /** -----------------------------------------
-         * Shipping
-         * ----------------------------------------*/
-
-        $shipping = ShippingPage::get()->first();
-
-        if ($shipping && $shipping->exists()) {
-            $list->push(ArrayData::create([
-                'Title'       => $shipping->Title,
-                'MenuTitle'   => $shipping->MenuTitle,
-                'LinkingMode' => $shipping->LinkingMode(),
-                'Link'        => $shipping->Link()
-            ]));
-        }
-
-        /** -----------------------------------------
-         * Warranty
-         * ----------------------------------------*/
-
-        if ($this->owner->AddWarrantyStep) {
-
-            $warranty = WarrantyPage::get()->first();
-
-            if ($warranty && $warranty->exists()) {
-                $list->push(ArrayData::create([
-                    'Title'       => $warranty->Title,
-                    'MenuTitle'   => $warranty->MenuTitle,
-                    'LinkingMode' => $warranty->LinkingMode(),
-                    'Link'        => $warranty->Link()
-                ]));
+            if (!empty($steps)) {
+                foreach ($steps as $step) {
+                    if (class_exists($step . 'CheckoutComponent')) {
+                        if ($step == 'Membership') {
+                            if (Checkout::member_creation_enabled() && !Member::currentUserID()) {
+                                $this->addComponent(call_user_func($step . 'CheckoutComponent::create'));
+                            }
+                            continue;
+                        } elseif ($step == 'Payment') {
+                            if (count(GatewayInfo::getSupportedGateways()) > 1) {
+                                $this->addComponent(call_user_func($step . 'CheckoutComponent::create'));
+                            }
+                        } else {
+                            $this->addComponent(call_user_func($step . 'CheckoutComponent::create'));
+                        }
+                    }
+                }
             }
         }
+    }
 
-        /** -----------------------------------------
-         * Accessories
-         * ----------------------------------------*/
+    public function getFormFields()
+    {
+        /** =========================================
+         * @var CheckoutComponent       $component
+         * @var FieldList               $cfields
+         * ========================================*/
 
-        if ($this->owner->AddAccessoriesStep) {
+        if (SiteConfig::current_site_config()->EnableCheckoutSteps) {
 
-            $accessories = AccessoriesPage::get()->first();
 
-            if ($accessories && $accessories->exists()) {
-                $list->push(ArrayData::create([
-                    'Title'       => $accessories->Title,
-                    'MenuTitle'   => $accessories->MenuTitle,
-                    'LinkingMode' => $accessories->LinkingMode(),
-                    'Link'        => $accessories->Link()
-                ]));
+            $fields = FieldList::create();
+            $pos    = 1;
+
+            foreach ($this->getComponents() as $component) {
+
+                $cname = $component->Name();
+
+                if ($cfields = $component->getFormFields($this->order)) {
+
+                    if ($cfields->count()) {
+
+                        /** -----------------------------------------
+                         * Header
+                         * ----------------------------------------*/
+
+                        $componentTitle = preg_replace('/([a-z])([A-Z])/s', '$1 $2', str_replace('CheckoutComponent', '', $cname));
+
+                        $componentData = ArrayData::create([
+                            'Title'      => _t('TOASTSHOP.' . $cname . 'Title', $componentTitle),
+                            'StepNumber' => $pos
+                        ]);
+
+                        $cfields->unshift(LiteralField::create(
+                            $cname . 'Header',
+                            $this->order->customise($componentData)->renderWith('CheckoutComponentHeader')->forTemplate()
+                        ));
+
+                        /** -----------------------------------------
+                         * Wrapper
+                         * ----------------------------------------*/
+
+                        $cfields->unshift(LiteralField::create($cname . 'Wrapper', '<div id="' . $cname . '_wrapper' . '">'));
+
+                        /** -----------------------------------------
+                         * Continue button
+                         * ----------------------------------------*/
+
+                        $cfields->push(
+                            FormAction::create($cname . '_continue', _t('TOASTSHOP.ContinueButton', 'Continue'))
+                                ->setUseButtonTag(true)
+                                ->addExtraClass('button button--secondary')
+                        );
+
+                        /** -----------------------------------------
+                         * Close
+                         * ----------------------------------------*/
+
+                        $cfields->push(LiteralField::create($cname . 'Close', '</div>'));
+
+                    }
+
+                    // Merge fields
+                    $fields->merge($cfields);
+                    $pos++;
+
+                } else {
+                    user_error("getFields on  " . $cname . " must return a FieldList");
+                }
             }
+
+            return $fields;
+        } else {
+            $fields = FieldList::create();
+            foreach ($this->getComponents() as $component) {
+                if ($cfields = $component->getFormFields($this->order)) {
+                    $fields->merge($cfields);
+                } else {
+                    user_error("getFields on  " . get_class($component) . " must return a FieldList");
+                }
+            }
+            return $fields;
         }
-
-        /** -----------------------------------------
-         * Review
-         * ----------------------------------------*/
-
-        $reviewPage = ReviewOrderPage::get()->first();
-
-        if ($reviewPage && $reviewPage->exists()) {
-            $list->push(ArrayData::create([
-                'Title'       => $reviewPage->Title,
-                'MenuTitle'   => $reviewPage->MenuTitle,
-                'LinkingMode' => $reviewPage->LinkingMode(),
-                'Link'        => $reviewPage->Link()
-            ]));
-        }
-
-        return $list;
     }
 }
