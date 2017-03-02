@@ -6,12 +6,28 @@
  * @property bool                          EnableCheckoutSteps
  * @property string                        EnabledSteps
  * @property SiteConfig|CheckoutStepConfig $owner
+ *
+ * @method HasManyList|CheckoutStepObject[] CheckoutSteps()
  */
 class CheckoutStepConfig extends DataExtension
 {
     private static $db = [
-        'EnableCheckoutSteps' => 'Boolean',
-        'EnabledSteps'        => 'Text'
+        'EnableCheckoutSteps' => 'Boolean'
+    ];
+
+    private static $has_many = [
+        'CheckoutSteps' => 'CheckoutStepObject'
+    ];
+
+    private static $available_components = [
+        'Membership'      => 'Membership',
+        'CustomerDetails' => 'Contact Details',
+        'ShippingAddress' => 'Shipping Address',
+        'BillingAddress'  => 'Billing Address',
+        'Accessories'     => 'Related Accessories',
+        'Payment'         => 'Payment Method',
+        'Notes'           => 'Notes',
+        'Terms'           => 'Terms and Conditions'
     ];
 
     /**
@@ -45,20 +61,61 @@ class CheckoutStepConfig extends DataExtension
 
             if ($this->owner->EnableCheckoutSteps) {
 
+                $gridField = GridField::create(
+                    'CheckoutSteps',
+                    'Steps',
+                    $this->owner->CheckoutSteps(),
+                    GridFieldConfig::create(50)
+                        ->addComponent(new GridFieldButtonRow('before'))
+                        ->addComponent(new GridFieldToolbarHeader())
+                        ->addComponent(new GridFieldOrderableRows('SortOrder'))
+                        ->addComponent(new GridFieldEditableColumns())
+                        ->addComponent(new GridFieldTitleHeader())
+                );
+
+                $gridField->getConfig()->getComponentByType('GridFieldEditableColumns')->setDisplayFields(array(
+                    'Title' => array(
+                        'title' => 'Title',
+                        'field' => 'ReadonlyField'
+                    ),
+                    'Type' => array(
+                        'title' => 'Type',
+                        'field' => 'ReadonlyField'
+                    ),
+                    'Enabled' => function($record, $column, $grid) {
+                        return new DropdownField($column, 'Enabled', array(
+                            '0' => 'No',
+                            '1' => 'Yes'
+                        ));
+                    },
+                ));
+
                 $fields->addFieldsToTab('Root.Toast.CheckoutSteps', [
-                    CheckboxSetField::create('EnabledSteps', 'Enabled checkout steps', [
-                        'Membership'      => 'Membership',
-                        'CustomerDetails' => 'Contact Details',
-                        'ShippingAddress' => 'Shipping Address',
-                        'BillingAddress'  => 'Billing Address',
-                        'Shipping'        => 'Shipping Method',
-                        'Accessories'     => 'Related Accessories',
-                        'Payment'         => 'Payment Method',
-                        'Notes'           => 'Notes',
-                        'Terms'           => 'Terms and Conditions',
-                    ])
+                    $gridField
                 ]);
             }
         }
+    }
+
+    public function onBeforeWrite()
+    {
+        $componentTypes = Config::inst()->get('SiteConfig', 'available_components');
+
+        if (is_array($componentTypes) && !empty($componentTypes)) {
+            foreach ($componentTypes as $type => $name) {
+                $obj = CheckoutStepObject::get()->filter(['Type' => $type, 'ParentID' => $this->owner->ID])->first();
+                if (!$obj) {
+                    $obj = CheckoutStepObject::create([
+                        'Type'     => $type,
+                        'Title'    => $name,
+                        'Enabled'  => 0,
+                        'ParentID' => $this->owner->ID
+                    ]);
+                    $obj->write();
+                }
+            }
+        }
+
+        parent::onBeforeWrite();
     }
 }

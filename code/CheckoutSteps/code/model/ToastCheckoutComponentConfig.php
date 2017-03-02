@@ -17,9 +17,9 @@ class ToastCheckoutComponentConfig extends CheckoutComponentConfig
 
         $siteConfig = SiteConfig::current_site_config();
 
-        if ($siteConfig->EnableCheckoutSteps) {
+        if ($siteConfig->CheckoutSteps()) {
 
-            $steps = explode(',', $siteConfig->EnabledSteps);
+            $steps = $siteConfig->CheckoutSteps()->filter(['Enabled' => 1])->column('Type');
             $steps = array_filter($steps);
 
             if (!empty($steps)) {
