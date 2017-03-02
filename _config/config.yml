@@ -16,3 +16,11 @@ Order:
 Injector:
   CheckoutComponentConfig:
     class: ToastCheckoutComponentConfig
+
+OrdersAdmin:
+  managed_models:
+    - Order
+    - OrderStatusLog
+    - SignUpMessage
+  extensions:
+    - ToastOrdersAdmin

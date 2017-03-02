@@ -11,6 +11,9 @@
  */
 class SignUpMessage extends DataObject
 {
+    private static $singular_name = 'Abandoned Cart';
+    private static $plural_name = 'Abandoned Carts';
+
     private static $db = array(
         'Name' => 'Varchar(500)',
         'Email' => 'Varchar(500)',

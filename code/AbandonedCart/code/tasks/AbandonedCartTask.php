@@ -8,8 +8,11 @@ class AbandonedCartTask extends BuildTask
     protected $title = 'Abandoned Cart Follow-up';
     protected $description = 'Sends email reminders to users who left a cart abandoned';
 
-    protected $header_image = 'https://gallery.mailchimp.com/46d3803336ec57ab278cf2c3f/images/8d0bab1b-aa53-4eb7-b8e7-99302ea5a86a.png';
-    protected $footer_image = 'https://gallery.mailchimp.com/46d3803336ec57ab278cf2c3f/images/88a7008b-22df-4b56-bd94-c5d7a3084d4b.png';
+    private static $default_header = 'https://gallery.mailchimp.com/46d3803336ec57ab278cf2c3f/images/8d0bab1b-aa53-4eb7-b8e7-99302ea5a86a.png';
+    private static $default_footer = 'https://gallery.mailchimp.com/46d3803336ec57ab278cf2c3f/images/88a7008b-22df-4b56-bd94-c5d7a3084d4b.png';
+
+    protected $header_image = '';
+    protected $footer_image = '';
     protected $email_subject = 'You left something behind!';
     protected $email_intro = '';
     protected $email_footer = '';
@@ -21,7 +24,7 @@ class AbandonedCartTask extends BuildTask
     public function __construct()
     {
         /** =========================================
-         * @var ShopConfig $siteConfig
+         * @var AbandonedCartConfig|SiteConfig $siteConfig
          * ========================================*/
 
         parent::__construct();
@@ -42,12 +45,16 @@ class AbandonedCartTask extends BuildTask
 
         if ($siteConfig->CartEmailHeaderImage() && $siteConfig->CartEmailHeaderImage()->exists()) {
             $headerImage = $siteConfig->CartEmailHeaderImage();
-            $this->header_image = $headerImage->CroppedImage(600, 360)->getAbsoluteURL();
+            $this->header_image = $headerImage->Fill(600, 360)->getAbsoluteURL();
+        } else {
+            $this->header_image = Config::inst()->get('AbandonedCartTask', 'default_header ');
         }
 
         if ($siteConfig->CartEmailFooterImage() && $siteConfig->CartEmailFooterImage()->exists()) {
             $footerImage = $siteConfig->CartEmailFooterImage();
-            $this->footer_image = $footerImage->CroppedImage(600, 360)->getAbsoluteURL();
+            $this->footer_image = $footerImage->Fill(600, 360)->getAbsoluteURL();
+        } else {
+            $this->footer_image = Config::inst()->get('AbandonedCartTask', 'default_footer ');
         }
 
         if ($siteConfig->CartEmailSubject) {
