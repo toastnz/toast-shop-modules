@@ -3,13 +3,13 @@
 /**
  * Class AbandonedCartTask
  */
-class AbandonedCartTask extends BuildTask
+class AbandonedCartTask implements CronTask
 {
     protected $title = 'Abandoned Cart Follow-up';
     protected $description = 'Sends email reminders to users who left a cart abandoned';
 
-    private static $default_header = 'https://gallery.mailchimp.com/46d3803336ec57ab278cf2c3f/images/8d0bab1b-aa53-4eb7-b8e7-99302ea5a86a.png';
-    private static $default_footer = 'https://gallery.mailchimp.com/46d3803336ec57ab278cf2c3f/images/88a7008b-22df-4b56-bd94-c5d7a3084d4b.png';
+    private static $default_header = '';
+    private static $default_footer = '';
 
     protected $header_image = '';
     protected $footer_image = '';
@@ -26,8 +26,6 @@ class AbandonedCartTask extends BuildTask
         /** =========================================
          * @var AbandonedCartConfig|SiteConfig $siteConfig
          * ========================================*/
-
-        parent::__construct();
 
         if (Director::is_cli()) {
             $this->br = PHP_EOL;
@@ -80,7 +78,7 @@ class AbandonedCartTask extends BuildTask
      * Implement this method in the task subclass to
      * execute via the TaskRunner
      */
-    public function run($request)
+    public function process()
     {
         if (SiteConfig::current_site_config()->EnableAbandonedCart) {
 
@@ -195,5 +193,15 @@ class AbandonedCartTask extends BuildTask
         $email->setTemplate('AbandonedCartEmail')
             ->populateTemplate($data)
             ->send();
+    }
+
+    /**
+     * Return a string for a CRON expression
+     *
+     * @return string
+     */
+    public function getSchedule()
+    {
+        return "*/15 * * * *";
     }
 }

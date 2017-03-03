@@ -99,7 +99,7 @@ class CheckoutStepConfig extends DataExtension
 
     public function onBeforeWrite()
     {
-        $componentTypes = Config::inst()->get('SiteConfig', 'available_components');
+        $componentTypes = Config::inst()->get('CheckoutStepConfig', 'available_components');
 
         if (is_array($componentTypes) && !empty($componentTypes)) {
             foreach ($componentTypes as $type => $name) {
