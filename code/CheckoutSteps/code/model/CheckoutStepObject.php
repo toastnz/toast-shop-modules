@@ -61,7 +61,7 @@ class CheckoutStepObject extends DataObject
 
         if ($this->exists() && $this->Type) {
             if (class_exists($this->Type . 'CheckoutComponent')) {
-                $this->component = self::singleton($this->Type . 'CheckoutComponent');
+                $this->component = singleton($this->Type . 'CheckoutComponent');
             }
         }
     }

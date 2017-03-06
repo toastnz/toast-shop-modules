@@ -18,7 +18,11 @@ class AccessoriesCheckoutComponent extends CheckoutComponent
     {
         $fields = FieldList::create();
 
-        $fields->push(LiteralField::create('AccessoriesThing', '<p>This is the accessories.</p>'));
+        $component = CheckoutStepObject::get()->filter(['Type' => 'Accessories'])->first();
+
+        $fields->push(LiteralField::create('Accessories',
+            $component->renderWith('AccessoriesCheckoutComponent')->forTemplate()
+        ));
 
         return $fields;
     }
