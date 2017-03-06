@@ -24,3 +24,18 @@ OrdersAdmin:
     - SignUpMessage
   extensions:
     - ToastOrdersAdmin
+
+CheckoutComponent:
+  extensions:
+    - ToastCheckoutComponentExtension
+
+Address:
+  extensions:
+    - ToastAddressExtension
+
+ShippingAddressCheckoutComponent:
+  extensions:
+    - ToastAddressComponentExtension
+
+ToastCheckoutComponentConfig:
+  formfielddescriptions: false

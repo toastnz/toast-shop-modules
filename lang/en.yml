@@ -2,3 +2,11 @@ en:
   TOASTSHOP:
     ContinueButton: 'Continue'
     PaymentCheckoutComponentTitle: 'Payment Confirmation'
+    CountryPlaceholder: 'Select Country'
+    SeparateBilling: 'Different Billing Address'
+  Address:
+    AddressPlaceholder: 'Address'
+    CityPlaceholder: 'City'
+    StatePlaceholder: 'State'
+    PostalCodePlaceholder: 'Post Code'
+    PhonePlaceholder: 'Phone'

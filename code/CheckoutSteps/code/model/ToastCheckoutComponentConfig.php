@@ -46,8 +46,8 @@ class ToastCheckoutComponentConfig extends CheckoutComponentConfig
     public function getFormFields()
     {
         /** =========================================
-         * @var CheckoutComponent       $component
-         * @var FieldList               $cfields
+         * @var CheckoutComponent_Namespaced $component
+         * @var FieldList                    $cfields
          * ========================================*/
 
         if (SiteConfig::current_site_config()->EnableCheckoutSteps) {
@@ -58,6 +58,11 @@ class ToastCheckoutComponentConfig extends CheckoutComponentConfig
             foreach ($this->getComponents() as $component) {
 
                 $cname = $component->Name();
+
+                // Set descriptions on Address
+                if ($component->Proxy() instanceof AddressCheckoutComponent) {
+                    $component->Proxy()->setShowFormFieldDescriptions(self::config()->get('formfielddescriptions'));
+                }
 
                 if ($cfields = $component->getFormFields($this->order)) {
 
@@ -84,6 +89,12 @@ class ToastCheckoutComponentConfig extends CheckoutComponentConfig
                          * ----------------------------------------*/
 
                         $cfields->unshift(LiteralField::create($cname . 'Wrapper', '<div id="' . $cname . '_wrapper" data-api-url="' . ShopAPIConfig::getApiUrl() . '/component/' . str_replace('CheckoutComponent', '', $cname) . '">'));
+
+                        /** -----------------------------------------
+                         * Component-specific Options
+                         * ----------------------------------------*/
+
+                        $cfields->merge($component->Proxy()->getAdditionalComponentFields());
 
                         /** -----------------------------------------
                          * Continue button
