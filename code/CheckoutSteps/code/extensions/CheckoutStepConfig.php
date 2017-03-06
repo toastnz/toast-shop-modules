@@ -37,6 +37,7 @@ class CheckoutStepConfig extends DataExtension
     {
         /** =========================================
          * @var HtmlEditorField $content
+         * @var GridFieldConfig $config
          * @var CheckboxField   $enableSteps
          * @var CheckboxField   $warrantyStep
          * @var CheckboxField   $accessoryStep
@@ -65,11 +66,13 @@ class CheckoutStepConfig extends DataExtension
                     'CheckoutSteps',
                     'Steps',
                     $this->owner->CheckoutSteps(),
-                    GridFieldConfig::create(50)
+                    GridFieldConfig::create()
                         ->addComponent(new GridFieldButtonRow('before'))
                         ->addComponent(new GridFieldToolbarHeader())
                         ->addComponent(new GridFieldOrderableRows('SortOrder'))
                         ->addComponent(new GridFieldEditableColumns())
+                        ->addComponent(new GridFieldDetailForm())
+                        ->addComponent(new GridFieldEditButton())
                         ->addComponent(new GridFieldTitleHeader())
                 );
 
@@ -99,7 +102,7 @@ class CheckoutStepConfig extends DataExtension
 
     public function onBeforeWrite()
     {
-        $componentTypes = Config::inst()->get('CheckoutStepConfig', 'available_components');
+        $componentTypes = Config::inst()->get('SiteConfig', 'available_components');
 
         if (is_array($componentTypes) && !empty($componentTypes)) {
             foreach ($componentTypes as $type => $name) {

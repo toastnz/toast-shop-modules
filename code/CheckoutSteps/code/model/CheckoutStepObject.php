@@ -15,7 +15,8 @@ class CheckoutStepObject extends DataObject
     protected $component;
 
     private static $has_one = [
-        'Parent' => 'SiteConfig'
+        'Parent'   => 'SiteConfig',
+        'Category' => 'ProductCategory'
     ];
 
     protected $order;
@@ -27,9 +28,36 @@ class CheckoutStepObject extends DataObject
         'Type'      => 'Varchar(100)'
     ];
 
-    public function __construct()
+    /**
+     * @return FieldList
+     */
+    public function getCMSFields()
     {
-        parent::__construct();
+        /** =========================================
+         * @var FieldList $fields
+         * ========================================*/
+
+        $fields = FieldList::create(TabSet::create('Root'));
+
+        $fields->addFieldsToTab('Root.Main', [
+            ReadonlyField::create('Title'),
+            ReadonlyField::create('Type'),
+            CheckboxField::create('Enabled', 'Enabled')
+        ]);
+
+        if ($this->Type == 'Accessories') {
+            $fields->addFieldToTab('Root.Main',
+                DropdownField::create('CategoryID', 'Product Category', ProductCategory::get()->map()->toArray())
+                    ->setEmptyString('-- Choose One --')
+            );
+        }
+
+        return $fields;
+    }
+
+    public function __construct($record = null, $isSingleton = false, $model = null)
+    {
+        parent::__construct($record, $isSingleton, $model);
 
         if ($this->exists() && $this->Type) {
             if (class_exists($this->Type . 'CheckoutComponent')) {

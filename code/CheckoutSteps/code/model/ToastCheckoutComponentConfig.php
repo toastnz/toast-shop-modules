@@ -83,7 +83,7 @@ class ToastCheckoutComponentConfig extends CheckoutComponentConfig
                          * Wrapper
                          * ----------------------------------------*/
 
-                        $cfields->unshift(LiteralField::create($cname . 'Wrapper', '<div id="' . $cname . '_wrapper' . '">'));
+                        $cfields->unshift(LiteralField::create($cname . 'Wrapper', '<div id="' . $cname . '_wrapper" data-api-url="' . ShopAPIConfig::getApiUrl() . '/component/' . str_replace('CheckoutComponent', '', $cname) . '">'));
 
                         /** -----------------------------------------
                          * Continue button
