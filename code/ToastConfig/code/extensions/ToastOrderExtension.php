@@ -36,6 +36,14 @@ class ToastOrderExtension extends DataExtension
     }
 
     /**
+     * @return null|OrderDiscountModifier
+     */
+    public function getDisplayPromoButton()
+    {
+        return $this->owner->getModifier('OrderDiscountModifier');
+    }
+
+    /**
      * @param Address $address
      * @throws ValidationException
      * @throws null
