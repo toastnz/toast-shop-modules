@@ -4,6 +4,7 @@ en:
     PaymentCheckoutComponentTitle: 'Payment Confirmation'
     CountryPlaceholder: 'Select Country'
     SeparateBilling: 'Different Billing Address'
+    LoginHeader: 'Please log in below'
   Address:
     AddressPlaceholder: 'Address'
     CityPlaceholder: 'City'
