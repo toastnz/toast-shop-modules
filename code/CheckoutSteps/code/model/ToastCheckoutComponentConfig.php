@@ -99,7 +99,9 @@ class ToastCheckoutComponentConfig extends CheckoutComponentConfig
                          * Component-specific Options
                          * ----------------------------------------*/
 
-                        $cfields->merge($component->Proxy()->getAdditionalComponentFields());
+//                        if (method_exists($component->Proxy(), 'getAdditionalComponentFields')) {
+                            $cfields->merge($component->Proxy()->getAdditionalComponentFields());
+//                        }
 
                         /** -----------------------------------------
                          * Continue button

@@ -20,7 +20,6 @@ class CheckoutStepConfig extends DataExtension
     ];
 
     private static $available_components = [
-        'Membership'      => 'Membership',
         'CustomerDetails' => 'Contact Details',
         'ShippingAddress' => 'Shipping Address',
         'BillingAddress'  => 'Billing Address',
