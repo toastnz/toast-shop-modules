@@ -76,22 +76,22 @@ class CheckoutStepConfig extends DataExtension
                         ->addComponent(new GridFieldTitleHeader())
                 );
 
-                $gridField->getConfig()->getComponentByType('GridFieldEditableColumns')->setDisplayFields(array(
-                    'Title' => array(
+                $gridField->getConfig()->getComponentByType('GridFieldEditableColumns')->setDisplayFields([
+                    'Title'   => [
                         'title' => 'Title',
                         'field' => 'ReadonlyField'
-                    ),
-                    'Type' => array(
+                    ],
+                    'Type'    => [
                         'title' => 'Type',
                         'field' => 'ReadonlyField'
-                    ),
-                    'Enabled' => function($record, $column, $grid) {
-                        return new DropdownField($column, 'Enabled', array(
+                    ],
+                    'Enabled' => function ($record, $column, $grid) {
+                        return new DropdownField($column, 'Enabled', [
                             '0' => 'No',
                             '1' => 'Yes'
-                        ));
+                        ]);
                     },
-                ));
+                ]);
 
                 $fields->addFieldsToTab('Root.Toast.CheckoutSteps', [
                     $gridField
@@ -105,17 +105,20 @@ class CheckoutStepConfig extends DataExtension
         $componentTypes = Config::inst()->get('SiteConfig', 'available_components');
 
         if (is_array($componentTypes) && !empty($componentTypes)) {
+            $sort = 0;
             foreach ($componentTypes as $type => $name) {
                 $obj = CheckoutStepObject::get()->filter(['Type' => $type, 'ParentID' => $this->owner->ID])->first();
                 if (!$obj) {
                     $obj = CheckoutStepObject::create([
-                        'Type'     => $type,
-                        'Title'    => $name,
-                        'Enabled'  => 0,
-                        'ParentID' => $this->owner->ID
+                        'Type'      => $type,
+                        'Title'     => $name,
+                        'Enabled'   => 0,
+                        'ParentID'  => $this->owner->ID,
+                        'SortOrder' => $sort
                     ]);
                     $obj->write();
                 }
+                $sort++;
             }
         }
 
