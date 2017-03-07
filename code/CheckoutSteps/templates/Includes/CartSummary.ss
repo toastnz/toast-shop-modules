@@ -2,7 +2,7 @@
     <div class="cart-summary">
         <h3>Summary</h3>
         <% loop $Items %>
-            <div class="cartOverview__item $FirstLast">
+            <div class="cart-summary__item $FirstLast">
                 <p>$TableTitle</p>
                 <% if $Image %>
                     {$Image.Fit(100,100)}
@@ -13,19 +13,46 @@
                     <a href="$getSetQuantity" class="js-augment augment" data-id="$ID">Update</a>
                 </div>
                 <div class="clearfix"></div>
-                <hr>
             </div>
         <% end_loop %>
         <hr>
+
         <div class="totals">
-            <h5>Total <span>{$Total.Nice}$Currency</span></h5>
+            <div class="subtotal">
+                <p>
+                    <%t Order.SubTotal "Sub-total" %>
+                    <span>{$SubTotal.Nice}</span>
+                </p>
+            </div>
+            <% if $ShowSubtotals %>
+                <% if $Modifiers %>
+                    <% loop $Modifiers %>
+                        <% if $ShowInTable %>
+                            <div class="subtotal {$Classes}">
+                                <p>
+                                    <% if $Link %>
+                                        <a href="$Link" title="<%t Shop.ReadMoreTitle "Click here to read more on &quot;{Title}&quot;" Title=$TableTitle %>">$TableTitle</a>
+                                    <% else %>
+                                        {$TableTitle}
+                                    <% end_if %>
+                                    <span>{$TableValue.Nice}</span>
+                                </p>
+                            </div>
+                        <% end_if %>
+                    <% end_loop %>
+                <% end_if %>
+
+                <div class="total">
+                    <p>
+                        <%t Order.Total "Total" %>
+                        <span>{$Total.Nice}{$Currency}</span>
+                    </p>
+                </div>
+            <% end_if %>
         </div>
     </div>
 <% else %>
     <p class="message warning">
         <%t ShoppingCart.NoItems "There are no items in your cart." %>
     </p>
-<% end_if %>
-<% if $DisplayPromoButton %>
-    <a href="{$Top.ShopApiUrl}/promocode/apply" class="button button--secondary">+ Add Promo Code</a>
 <% end_if %>

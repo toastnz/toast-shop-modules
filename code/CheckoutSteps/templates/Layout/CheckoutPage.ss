@@ -16,6 +16,7 @@
         <% if $Cart %>
             <% with $Cart %>
                 <% include CartSummary %>
+                <% include PromoCode %>
             <% end_with %>
             $OrderForm
         <% else %>
