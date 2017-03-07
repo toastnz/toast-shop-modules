@@ -5,7 +5,7 @@
  *
  * @property CustomerDetailsCheckoutComponent $owner
  */
-class MembershipComponentExtension extends Extension
+class CustomerDetailsComponentExtension extends Extension
 {
     protected $requiredfields = array(
 
