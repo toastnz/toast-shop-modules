@@ -31,3 +31,7 @@ ShippingAddressCheckoutComponent:
 Product:
   extensions:
     - ToastProductExtension
+
+PaymentCheckoutComponent:
+  extensions:
+    - ToastPaymentComponentExtension

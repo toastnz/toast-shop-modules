@@ -34,6 +34,10 @@ class ToastCheckoutComponentConfig extends CheckoutComponentConfig
                             if (count(GatewayInfo::getSupportedGateways()) > 1) {
                                 $this->addComponent(call_user_func($step . 'CheckoutComponent::create'));
                             }
+                        } elseif ($step == 'Accessories') {
+                            if ($order->getRelatedProducts() && $order->getRelatedProducts()->exists()) {
+                                $this->addComponent(call_user_func($step . 'CheckoutComponent::create'));
+                            }
                         } else {
                             $this->addComponent(call_user_func($step . 'CheckoutComponent::create'));
                         }
@@ -54,6 +58,7 @@ class ToastCheckoutComponentConfig extends CheckoutComponentConfig
 
             $fields = FieldList::create();
             $pos    = 1;
+            $total = $this->getComponents() ? $this->getComponents()->count() : 0;
 
             foreach ($this->getComponents() as $component) {
 
@@ -100,11 +105,13 @@ class ToastCheckoutComponentConfig extends CheckoutComponentConfig
                          * Continue button
                          * ----------------------------------------*/
 
-                        $cfields->push(
-                            FormAction::create($cname . '_continue', _t('TOASTSHOP.ContinueButton', 'Continue'))
-                                ->setUseButtonTag(true)
-                                ->addExtraClass('button button--secondary js-continue')
-                        );
+                        if ($pos < $total) {
+                            $cfields->push(
+                                FormAction::create($cname . '_continue', _t('TOASTSHOP.ContinueButton', 'Continue'))
+                                    ->setUseButtonTag(true)
+                                    ->addExtraClass('button button--secondary js-continue')
+                            );
+                        }
 
                         /** -----------------------------------------
                          * Close
