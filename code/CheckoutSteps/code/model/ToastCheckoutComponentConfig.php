@@ -88,7 +88,7 @@ class ToastCheckoutComponentConfig extends CheckoutComponentConfig
                          * Wrapper
                          * ----------------------------------------*/
 
-                        $cfields->unshift(LiteralField::create($cname . 'Wrapper', '<div id="' . $cname . '_wrapper" data-api-url="' . ShopAPIConfig::getApiUrl() . '/component/' . str_replace('CheckoutComponent', '', $cname) . '">'));
+                        $cfields->unshift(LiteralField::create($cname . 'Wrapper', '<div id="' . $cname . '_wrapper" class="checkout-component" data-api-url="' . ShopAPIConfig::getApiUrl() . '/component/' . str_replace('CheckoutComponent', '', $cname) . '">'));
 
                         /** -----------------------------------------
                          * Component-specific Options
@@ -103,7 +103,7 @@ class ToastCheckoutComponentConfig extends CheckoutComponentConfig
                         $cfields->push(
                             FormAction::create($cname . '_continue', _t('TOASTSHOP.ContinueButton', 'Continue'))
                                 ->setUseButtonTag(true)
-                                ->addExtraClass('button button--secondary')
+                                ->addExtraClass('button button--secondary js-continue')
                         );
 
                         /** -----------------------------------------

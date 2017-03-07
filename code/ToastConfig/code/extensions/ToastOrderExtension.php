@@ -1,10 +1,34 @@
 <?php
 
 /**
- * Class ToastCartExtension
+ * Class ToastOrderExtension
+ *
+ * @property Order $owner
  */
-class ToastCartExtension extends DataExtension
+class ToastOrderExtension extends DataExtension
 {
+    public function getRelatedProducts()
+    {
+        /** =========================================
+         * @var ArrayList $related
+         * ========================================*/
+
+        $itemIDs = $this->owner->Items()->column();
+        $products = Versioned::get_by_stage('Product', Versioned::current_stage())
+            ->leftJoin('Product_OrderItem', '"Product_OrderItem"."ProductID" = "Product"."ID"')
+            ->where(['"Product_OrderItem"."ID"' => $itemIDs]);
+
+        $related = ArrayList::create();
+
+        foreach ($products as $product) {
+            if ($product->RelatedProducts() && $product->RelatedProducts()->exists()) {
+                $related->merge($product->RelatedProducts());
+            }
+        }
+
+        return $related;
+    }
+
     /**
      * @param Address $address
      * @throws ValidationException
@@ -41,11 +65,6 @@ class ToastCartExtension extends DataExtension
     public function onAfterWrite()
     {
         parent::onAfterWrite();
-
-        /** -----------------------------------------
-         * Create Record
-         * ----------------------------------------*/
-
 
         /** -----------------------------------------
          * Clear Abandoned Cart

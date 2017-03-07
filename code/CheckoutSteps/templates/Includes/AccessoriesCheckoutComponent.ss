@@ -1,11 +1,11 @@
 <% include CheckoutComponentHeader %>
 
-<% if $Category %>
-    <% with $Category %>
+<% with $Order %>
+    <% if $RelatedProducts %>
         <ul>
-            <% loop $ProductsShowable %>
+            <% loop $RelatedProducts %>
                 <li><a href="{$Link}">{$Title}</a></li>
             <% end_loop %>
         </ul>
-    <% end_with %>
-<% end_if %>
+    <% end_if %>
+<% end_with %>

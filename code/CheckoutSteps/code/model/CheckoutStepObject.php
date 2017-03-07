@@ -15,8 +15,7 @@ class CheckoutStepObject extends DataObject
     protected $component;
 
     private static $has_one = [
-        'Parent'   => 'SiteConfig',
-        'Category' => 'ProductCategory'
+        'Parent'   => 'SiteConfig'
     ];
 
     protected $order;
@@ -45,13 +44,6 @@ class CheckoutStepObject extends DataObject
             CheckboxField::create('Enabled', 'Enabled')
         ]);
 
-        if ($this->Type == 'Accessories') {
-            $fields->addFieldToTab('Root.Main',
-                DropdownField::create('CategoryID', 'Product Category', ProductCategory::get()->map()->toArray())
-                    ->setEmptyString('-- Choose One --')
-            );
-        }
-
         return $fields;
     }
 
@@ -64,6 +56,11 @@ class CheckoutStepObject extends DataObject
                 $this->component = singleton($this->Type . 'CheckoutComponent');
             }
         }
+    }
+
+    public function getOrder()
+    {
+        return ShoppingCart::curr();
     }
 
     public function forTemplate()

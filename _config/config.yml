@@ -2,17 +2,6 @@
 Name: toastconfig
 After: 'framework/*','cms/*'
 ---
-SiteConfig:
-  extensions:
-    - ToastConfig
-    - AbandonedCartConfig
-    - SignUpModalConfig
-    - CheckoutStepConfig
-
-Order:
-  extensions:
-    - ToastCartExtension
-
 Injector:
   CheckoutComponentConfig:
     class: ToastCheckoutComponentConfig
@@ -22,20 +11,6 @@ OrdersAdmin:
     - Order
     - OrderStatusLog
     - SignUpMessage
-  extensions:
-    - ToastOrdersAdmin
-
-CheckoutComponent:
-  extensions:
-    - ToastCheckoutComponentExtension
-
-Address:
-  extensions:
-    - ToastAddressExtension
-
-ShippingAddressCheckoutComponent:
-  extensions:
-    - ToastAddressComponentExtension
 
 ToastCheckoutComponentConfig:
   formfielddescriptions: false

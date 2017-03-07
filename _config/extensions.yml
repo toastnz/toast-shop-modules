@@ -1,0 +1,33 @@
+---
+Name: toastshopextensions
+After: 'framework/*','cms/*'
+---
+SiteConfig:
+  extensions:
+    - ToastConfig
+    - AbandonedCartConfig
+    - SignUpModalConfig
+    - CheckoutStepConfig
+Order:
+  extensions:
+    - ToastOrderExtension
+
+OrdersAdmin:
+  extensions:
+    - ToastOrdersAdmin
+
+CheckoutComponent:
+  extensions:
+    - ToastCheckoutComponentExtension
+
+Address:
+  extensions:
+    - ToastAddressExtension
+
+ShippingAddressCheckoutComponent:
+  extensions:
+    - ToastAddressComponentExtension
+
+Product:
+  extensions:
+    - ToastProductExtension
