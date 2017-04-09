@@ -30,6 +30,8 @@ class ToastProductExtension extends DataExtension
             $config
         );
 
+        $fields->findOrMakeTab('Root.RelatedProducts', _t('TOASTSHOP.RelatedTab', 'Related Products'));
+
         $fields->addFieldsToTab('Root.RelatedProducts', [
             $gridField
         ]);
