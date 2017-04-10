@@ -84,10 +84,17 @@ class ToastCheckoutComponentConfig extends CheckoutComponentConfig
                             'StepNumber' => $pos
                         ]);
 
+                        // Inner wrapper
+                        $cfields->unshift(LiteralField::create(
+                            $cname . 'InnerWrapper',
+                            '<div class="component-inner-wrapper" data-id="' . $pos . '">'
+                        ));
+
                         $cfields->unshift(LiteralField::create(
                             $cname . 'Header',
-                            $this->order->customise($componentData)->renderWith('CheckoutComponentHeader')->forTemplate()
+                            $this->order->customise($componentData)->renderWith('CheckoutComponentHeader', ['Pos' => $pos])->forTemplate()
                         ));
+
 
                         /** -----------------------------------------
                          * Wrapper
@@ -108,6 +115,7 @@ class ToastCheckoutComponentConfig extends CheckoutComponentConfig
                          * ----------------------------------------*/
 
                         if ($pos < $total) {
+                            $cfields->push( LiteralField::create($cname . '_innerWrapClose', '</div>'));
                             $cfields->push(
                                 FormAction::create($cname . '_continue', _t('TOASTSHOP.ContinueButton', 'Continue'))
                                     ->setUseButtonTag(true)
