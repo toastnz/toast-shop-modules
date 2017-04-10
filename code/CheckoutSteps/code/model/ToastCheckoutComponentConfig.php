@@ -87,7 +87,7 @@ class ToastCheckoutComponentConfig extends CheckoutComponentConfig
                         // Inner wrapper
                         $cfields->unshift(LiteralField::create(
                             $cname . 'InnerWrapper',
-                            '<div class="component-inner-wrapper" data-id="' . $pos . '">'
+                            '<div class="componentInner" data-id="' . $pos . '">'
                         ));
 
                         $cfields->unshift(LiteralField::create(
