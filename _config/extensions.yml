@@ -35,7 +35,3 @@ Product:
 PaymentCheckoutComponent:
   extensions:
     - ToastPaymentComponentExtension
-
-CustomerDetailsCheckoutComponent:
-  extensions:
-    - CustomerDetailsComponentExtension
