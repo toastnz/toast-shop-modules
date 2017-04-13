@@ -20,7 +20,7 @@ class CustomerLoginCheckoutComponent extends CheckoutComponent
             OptionsetField::create('GuestOrRegister', '', [
                 'Guest' => 'Checkout as Guest',
                 'Register' => 'Register'
-            ]),
+            ], 'Guest'),
             LiteralField::create('SwitchClose', '</div>'),
 
             LiteralField::create('GuestWrapper', '<div id="Guest_wrapper">'),
@@ -44,7 +44,7 @@ class CustomerLoginCheckoutComponent extends CheckoutComponent
 
         $loginFields->merge($fields);
 
-        return $fields;
+        return $loginFields;
     }
 
     public function validateData(Order $order, array $data)
