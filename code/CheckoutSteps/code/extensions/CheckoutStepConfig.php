@@ -27,6 +27,7 @@ class CheckoutStepConfig extends DataExtension
         'Accessories'     => 'Related Accessories',
         'Payment'         => 'Payment Method',
         'Notes'           => 'Notes',
+        'Summary'         => 'Order Summary',
         'Terms'           => 'Terms and Conditions'
     ];
 
