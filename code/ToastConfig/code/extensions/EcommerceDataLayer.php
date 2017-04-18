@@ -202,7 +202,9 @@ class EcommerceDataLayer extends Extension
                 $mData .= "'id': '" . $oOrder->ID . "',\n\t\t\t\t\t";
                 $mData .= "'affiliation': 'Online Store " . $oOrder->ShippingAddress()->Country . "',\n\t\t\t\t\t";
                 $mData .= "'revenue': '" . $oOrder->Total . "',\n\t\t\t\t\t";
-                $mData .= "'shipping': '" . $oOrder->getModifier('CustomShippingFrameworkModifier')->Amount . "'\n\t\t\t\t";
+                if (class_exists('CustomShippingFrameworkModifier')) {
+                    $mData .= "'shipping': '" . $oOrder->getModifier('CustomShippingFrameworkModifier')->Amount . "'\n\t\t\t\t";
+                }
                 // If there are Order Items
                 if ($oOrder->Items()) {
                     $mData .= "},\n\t\t\t\t";
