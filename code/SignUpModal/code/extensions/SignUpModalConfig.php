@@ -63,6 +63,10 @@ class SignUpModalConfig extends DataExtension
     {
         $recordID = Session::get('Toast.SignUpRecord');
 
-        return SignUpMessage::get_by_id('SignUpMessage', $recordID);
+        if (is_numeric($recordID)) {
+            return SignUpMessage::get_by_id('SignUpMessage', $recordID);
+        }
+
+        return null;
     }
 }
