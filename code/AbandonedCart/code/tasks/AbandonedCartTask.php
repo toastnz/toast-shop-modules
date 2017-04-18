@@ -155,7 +155,6 @@ class AbandonedCartTask implements CronTask
     {
         /** =========================================
          * @var Email $email
-         * @var SiteTree $shippingPage
          * @var Order $order
          * @var DataList $items
          * @var OrderItem $orderItem
@@ -163,10 +162,10 @@ class AbandonedCartTask implements CronTask
 
         $email = Email::create($this->email_reply_to, $data['Email'], $this->email_subject);
 
-        $shippingPage = SiteTree::get_one('ShippingPage');
+        $cart = CartPage::get_one('CartPage');
 
-        if ($shippingPage && $shippingPage->exists()) {
-            $link = $shippingPage->AbsoluteLink();
+        if ($cart && $cart->exists()) {
+            $link = $cart->AbsoluteLink();
         } else {
             $link = Controller::join_links(Director::absoluteBaseURL(), 'cart');
         }
