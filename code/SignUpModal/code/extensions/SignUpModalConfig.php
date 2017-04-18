@@ -59,4 +59,10 @@ class SignUpModalConfig extends DataExtension
         }
     }
 
+    public static function currentSignUpRecord()
+    {
+        $recordID = Session::get('Toast.SignUpRecord');
+
+        return SignUpMessage::get_by_id('SignUpMessage', $recordID);
+    }
 }

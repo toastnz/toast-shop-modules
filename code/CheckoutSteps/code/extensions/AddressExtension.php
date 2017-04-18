@@ -39,6 +39,24 @@ class ToastAddressExtension extends DataExtension
                 ->addExtraClass('input-wrap input-wrap--half')
         ]);
 
+        /** -----------------------------------------
+         * Signup Modal
+         * ----------------------------------------*/
+
+        $config = SiteConfig::current_site_config();
+
+        if ($config->EnableSignUpModal) {
+            // Get the active record
+            $signUp = SignUpModalConfig::currentSignUpRecord();
+            if ($signUp && $signUp->exists()) {
+                // Populate values with name / email
+                $additionalFields->setValues([
+                    'FirstName' => $signUp->Name,
+                    'Email' => $signUp->Email,
+                ]);
+            }
+        }
+
         $fields->merge($additionalFields);
 
         // Set up placeholders
