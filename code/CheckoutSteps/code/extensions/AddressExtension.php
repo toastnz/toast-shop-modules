@@ -65,6 +65,21 @@ class ToastAddressExtension extends DataExtension
         // Adjust field order
         $fields->changeFieldOrder(['FirstName', 'Surname', 'Email', 'Phone', 'Address', 'AddressLine2', 'City', 'State', 'PostalCode', 'Country']);
     }
+
+    /**
+     * @param array $fields
+     */
+    public function updateRequiredFields(&$fields)
+    {
+        $additionalFields = [
+            'FirstName' => 'First Name',
+            'Surname' => 'Surname',
+            'Email' => 'Email',
+            'Phone' => 'Phone'
+        ];
+
+        array_merge($fields, $additionalFields);
+    }
 }
 
 /**
