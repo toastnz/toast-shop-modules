@@ -138,7 +138,7 @@ class RegistrationForm extends Form
             $products = DropdownField::create('RegisteredProductID', 'Machine', $arguments['Products']);
             $products->setEmptyString('( Please Choose )');
 
-            $fields->insertBefore($products, 'FirstName');
+            $fields->insertBefore('FirstName', $products);
         }
 
         return $fields;
