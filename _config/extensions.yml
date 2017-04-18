@@ -11,6 +11,7 @@ SiteConfig:
 Order:
   extensions:
     - ToastOrderExtension
+    - EcommerceDataLayerOrder
 
 OrdersAdmin:
   extensions:

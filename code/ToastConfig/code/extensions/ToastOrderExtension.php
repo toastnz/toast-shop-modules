@@ -123,18 +123,4 @@ class ToastOrderExtension extends DataExtension
             }
         }
     }
-
-    /**
-     * Set "on payment" into a session var
-     * Used for the Google Tag Manager dataLayer, which is created in the Page_Controller
-     *
-     * @return void
-     */
-    public function onPayment()
-    {
-        // Set the order ID into a session var for the Google Tag Manager dataLayer
-        Session::set('order_on_payment', $this->owner->ID);
-        // Set the order ID into a session var for the Facebook Purchase tracking
-        Session::set('facebook_order_tracking', $this->owner->ID);
-    }
 }
