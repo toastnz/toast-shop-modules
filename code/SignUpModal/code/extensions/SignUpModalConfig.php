@@ -5,17 +5,25 @@
  *
  * @property string EnableSignUpModal
  * @property string SignUpModalText
+ * @property string SignUpHeading
  * @property string SignUpSuccessMessage
  *
- * @mixin SiteConfig
+ * @method Image SignUpHeaderImage()
+ *
+ * @property SiteConfig $owner
  */
 class SignUpModalConfig extends DataExtension
 {
     private static $db = array(
         'EnableSignUpModal' => 'Boolean',
         'SignUpModalText' => 'HTMLText',
-        'SignUpSuccessMessage' => 'HTMLText'
+        'SignUpSuccessMessage' => 'HTMLText',
+        'SignUpHeading' => 'Varchar(100)'
     );
+
+    private static $has_one = [
+        'SignUpHeaderImage' => 'Image'
+    ];
 
     /**
      * @param FieldList $fields
@@ -53,6 +61,11 @@ class SignUpModalConfig extends DataExtension
                 HeaderField::create('Sign-Up Modal'),
                 $enableSignup,
                 $success,
+                HeaderField::create('', 'Modal Content'),
+                UploadField::create('SignUpHeaderImage', 'Header Image')
+                    ->setDescription('Ideal size: 1640px * 420px'),
+                TextField::create('SignUpHeading', 'Heading')
+                    ->setAttribute('placeholder', 'Default: REGISTER AND SAVE'),
                 $content
             ));
 
