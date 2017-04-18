@@ -12,6 +12,7 @@ Order:
   extensions:
     - ToastOrderExtension
     - EcommerceDataLayerOrder
+    - ExportOrderExtension
 
 OrdersAdmin:
   extensions:
