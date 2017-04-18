@@ -74,6 +74,19 @@ class ToastOrderExtension extends DataExtension
                 $record->write();
             }
         }
+
+        /** -----------------------------------------
+         * Member
+         * ----------------------------------------*/
+
+        // Check if the order has a firstname/email
+        if (empty($this->owner->FirstName) || empty($this->owner->Email)) {
+            // Set them to be the shipping address
+            $this->owner->setField('FirstName', $address->FirstName);
+            $this->owner->setField('Surname', $address->Surname);
+            $this->owner->setField('Email', $address->Email);
+//            $this->owner->write();
+        }
     }
 
     public function onAfterWrite()
