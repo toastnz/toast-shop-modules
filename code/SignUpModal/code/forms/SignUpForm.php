@@ -115,8 +115,15 @@ class SignUpForm extends Form
         Session::set('FormInfo.Form_' . $this->name . '.data', $data);
 
         if (isset($data['Email']) && $data['Email'] != '') {
-            $form->setMessage('Spam protection field should be empty', 'bad');
-            return $this->controller->redirect($this->controller->Link());
+            if ($this->request->isAjax()) {
+                $data = array(
+                    'error' => true,
+                    'html' => 'Spam protection field should be empty'
+                );
+                return json_encode($data,  JSON_HEX_QUOT | JSON_HEX_TAG);
+            } else {
+                return $this->controller->redirect($this->controller->data()->Link('?success=1'));
+            }
         }
 
         $data['Email'] = $data['Contact'];
@@ -148,6 +155,7 @@ class SignUpForm extends Form
 
         if ($this->request->isAjax()) {
             $data = array(
+                'success' => true,
                 'record_id' => $recordID,
                 'html' => $message
             );
