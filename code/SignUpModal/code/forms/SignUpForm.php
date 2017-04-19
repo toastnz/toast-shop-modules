@@ -142,14 +142,14 @@ class SignUpForm extends Form
 
         Session::clear('FormInfo.Form_' . $this->name . '.data');
 
-        $message = $siteConfig->dbObject('SignUpSuccessMessage') ? : '<p>Your enquiry has been received.</p>';
+        $message = $siteConfig->dbObject('SignUpSuccessMessage')->forTemplate() ? : '<p>Your enquiry has been received.</p>';
 
         $this->setMessage($message, 'success');
 
         if ($this->request->isAjax()) {
             $data = array(
                 'record_id' => $recordID,
-                'html' => $this->renderWith('Form', array('Message' => $message))->forTemplate()
+                'html' => $message
             );
             return json_encode($data,  JSON_HEX_QUOT | JSON_HEX_TAG);
         } else {
