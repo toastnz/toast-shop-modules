@@ -34,7 +34,7 @@ class ExportOrderExtension extends DataExtension
 
     public function updateSummaryFields(&$fields)
     {
-        $fields = Config::inst()->get($this->class, 'summary_fields');
+        $fields = Config::inst()->get($this->owner->class, 'summary_fields');
     }
 
     private static $searchable_fields = [
