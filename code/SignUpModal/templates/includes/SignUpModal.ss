@@ -2,9 +2,9 @@
     <div class="popup__overlay wysiwyg">
         <div class="popup__content">
             <% with $SiteConfig %>
-                <div class="popup__content__header" style="background-image:url('{$SignUpHeader.Fill(1640,420).URL}');">
-                    <% if $Heading %>
-                        <h2>{$Heading}</h2>
+                <div class="popup__content__header" style="background-image:url('{$SignUpHeaderImage.Fill(1640,420).URL}');">
+                    <% if $SignUpHeading %>
+                        <h2>{$SignUpHeading}</h2>
                     <% else %>
                         <h2>REGISTER AND SAVE</h2>
                     <% end_if %>
