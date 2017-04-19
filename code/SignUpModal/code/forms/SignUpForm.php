@@ -149,7 +149,7 @@ class SignUpForm extends Form
         if ($this->request->isAjax()) {
             $data = array(
                 'record_id' => $recordID,
-                'html' => $this->renderWith('SignUpForm', array('Message' => $message))->forTemplate()
+                'html' => $this->renderWith('Form', array('Message' => $message))->forTemplate()
             );
             return json_encode($data,  JSON_HEX_QUOT | JSON_HEX_TAG);
         } else {
