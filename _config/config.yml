@@ -15,6 +15,3 @@ OrdersAdmin:
 ToastCheckoutComponentConfig:
   formfielddescriptions: false
 
-SiteConfig:
-  extensions:
-    - ExportOrderSiteConfigExtension

@@ -23,33 +23,37 @@ class ExportOrdersConfig extends DataExtension
             }
 
             /** -----------------------------------------
-             * Sign-up Modal
-             * ----------------------------------------*/
+             * Data Exports
+             * -------------------------------------------*/
+
+            // Check the Subsite and set the default order export email address
+            // NOTE: Used for the field description hints only.
 
             $fields->findOrMakeTab('Root.Toast.Exports', 'Exports');
 
             switch (Subsite::currentSubsiteID()) {
                 case '0':
                 default:
+                    $sOrderExportEmailFrom = (defined('DEFAULT_NZ_ORDER_EXPORT_EMAIL_FROM')) ? DEFAULT_NZ_ORDER_EXPORT_EMAIL_FROM : '';
                     $sOrderExportEmailTo = (defined('DEFAULT_NZ_ORDER_EXPORT_EMAIL_TO')) ? DEFAULT_NZ_ORDER_EXPORT_EMAIL_TO : '';
                     break;
                 case '1':
+                    $sOrderExportEmailFrom = (defined('DEFAULT_AUS_ORDER_EXPORT_EMAIL_FROM')) ? DEFAULT_AUS_ORDER_EXPORT_EMAIL_FROM : '';
                     $sOrderExportEmailTo = (defined('DEFAULT_AUS_ORDER_EXPORT_EMAIL_TO')) ? DEFAULT_AUS_ORDER_EXPORT_EMAIL_TO : '';
                     break;
             }
             // If the site is in dev mode
             if (!Director::isLive()) {
                 $sDefaultOrderExportEmailTo = (defined('DEFAULT_DEV_ORDER_EXPORT_EMAIL_TO')) ? DEFAULT_DEV_ORDER_EXPORT_EMAIL_TO : '';
-                // Live mode, use the regional email address
+            // Live mode, use the regional email address
             } else {
                 $sDefaultOrderExportEmailTo = $sOrderExportEmailTo;
             }
-            $sDefaultOrderExportEmailFrom = (defined('DEFAULT_ORDER_EXPORT_EMAIL_FROM')) ? DEFAULT_ORDER_EXPORT_EMAIL_FROM : '';
 
             // Add the fields to the Data Exports tab
             $fields->addFieldsToTab('Root.Toast.Exports', [
                 HeaderField::create('', 'Export Email Addresses'),
-                EmailField::create('ExportEmailFrom')->setRightTitle($sDefaultOrderExportEmailFrom),
+                EmailField::create('ExportEmailFrom')->setRightTitle($sOrderExportEmailFrom),
                 EmailField::create('ExportEmailTo')->setRightTitle($sDefaultOrderExportEmailTo),
                 EmailField::create('ExportEmailCC', 'Export CC')->setRightTitle('admin@toast.co.nz')
             ]);
