@@ -17,6 +17,7 @@ class ExportOrders extends Object
         $sCountry = ($mRegion) ? $mRegion : 'nz' ;
         // Set the default Subsite ID
         $iSubsiteID = 0;
+        $countryCode = 'nz';
         // Check which country is required
         switch ($sCountry) {
             // Main site
@@ -28,6 +29,7 @@ class ExportOrders extends Object
                 if ($oSubsite = Subsite::get()->filter('CountryCode', $sCountry)->first()) {
                     // Set the AUS Subsite ID
                     $iSubsiteID = $oSubsite->ID;
+                    $countryCode = 'au';
                 }
                 break;
         }
@@ -62,7 +64,7 @@ class ExportOrders extends Object
         $oOrders = Order::get()->filter(array(
             'AutoExported' => 0,
             'Status' => 'Paid',
-            'ShippingAddress.Country' => $sCountry
+            'ShippingAddress.Country' => $countryCode
         ))->limit(1000);
         // If there are any
         if ($oOrders->exists()) {
