@@ -84,13 +84,13 @@ class ExportOrders extends Object
                 $sPhone = $oOrder->getPhone();
                 $sStockCodes = $oOrder->StockCodes();
                 $sItemPrices = $oOrder->ItemPrices(true);
-                $sItemDiscountedPrices = $oOrder->ItemDiscountedPrices();
+                $sItemDiscountedPrices = $oOrder->ItemDiscountedPrices(true);
                 $sItemsQty = $oOrder->ItemsQty();
                 $sDiscountCode = $oOrder->getDiscountCode();
                 $sDiscountAmount = $oOrder->getDiscountAmount();
                 $sNotes = str_replace('"', '', $oOrder->Notes); // Remove double quotes
                 $sShippingTotal = $oOrder->ShippingTotal();
-                $sTotal = $oOrder->Total;
+                $sTotal = $oOrder->ExportTotal();
                 $sStatus = $oOrder->Status;
                 $sTokenStatus = $oOrder->TokenStatus;
                 // Add the Order details to the email content
@@ -127,10 +127,10 @@ class ExportOrders extends Object
                 // Increment the number of Orders
                 $iNumberOfExportedOrders++;
                 // Set the AutoExported status to 1
-                if ($oOrder->Status == 'Paid') {
-                    $oOrder->AutoExported = 1;
-                    $oOrder->write();
-                }
+//                if ($oOrder->Status == 'Paid') {
+//                    $oOrder->AutoExported = 1;
+//                    $oOrder->write();
+//                }
             }
         }
         // Close the file

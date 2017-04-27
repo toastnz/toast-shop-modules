@@ -16,13 +16,14 @@ class ExportOrderExtension extends DataExtension
         'Address1'      => 'Address1',
         'Address2'      => 'Address2',
         'Address3'      => 'Address3',
-        'Address4'      => 'Address4',
-        'Address5'      => 'Address5',
-        'Address6'      => 'Address6',
+        'Address4'      => 'City',
+        'Address5'      => 'Postal Code',
+        'Address6'      => 'Country',
         'Email'         => 'Email',
         'Phone'         => 'Phone',
         'StockCodes'    => 'Stock Codes',
         'ItemPrices'    => 'Prices',
+        'ItemDiscountedPrices' => 'Discounted Prices',
         'ItemsQty'      => 'Qty',
         'Discount'      => 'Discount',
         'Notes'         => 'Delivery Instructions',
@@ -252,39 +253,6 @@ class ExportOrderExtension extends DataExtension
     }
 
     /**
-     * Get the order items prices
-     *
-     * @return null|string
-     */
-    public function ItemPrices()
-    {
-        // Get the order items
-        $oItems = $this->owner->Items();
-        // If there are any
-        if ($oItems) {
-            // Create the return string
-            $sPrices = '';
-            // Loop through the items
-            foreach ($oItems as $oItem) {
-                // If there is a buyable product and a product BasePrice
-                if ($oItem->Buyable() && $oItem->Buyable()->BasePrice) {
-                    // Add the price into the return string
-                    $sPrices .= $oItem->Buyable()->BasePrice . ',';
-                }
-            }
-            // If the last character is a comma
-            if (substr(trim($sPrices), -1) == ',') {
-                // Remove the last comma
-                $sPrices = substr($sPrices, 0, -1);
-            }
-            return $sPrices;
-        }
-
-        return null;
-    }
-
-
-    /**
      * Get the order items SKUs
      *
      * @return null|string
@@ -316,7 +284,6 @@ class ExportOrderExtension extends DataExtension
         return null;
     }
 
-
     /**
      * Get the order total for the export functionality
      *
@@ -324,7 +291,7 @@ class ExportOrderExtension extends DataExtension
      */
     public function ExportTotal() {
         // If this is a Token payment order (it contains a Token product)
-        if ($this->owner->getIsTokenPayment()) {
+        if ($this->owner->getIsThisTokenPayment()) {
             // Set the return value
             $nExportTotal = 0;
             // If there are any order items
@@ -344,6 +311,30 @@ class ExportOrderExtension extends DataExtension
         } else {
             return $this->owner->Total;
         }
+    }
+
+    /**
+     * Check for token payment product
+     *
+     * @return bool
+     */
+    public function getIsThisTokenPayment()
+    {
+        // If there are any order items
+        if (count($this->owner->Items())) {
+            // Get the items
+            $items = $this->owner->Items();
+            // Loop through them
+            foreach ($items as $item) {
+                // If the ProductID belongs to a TokenProduct
+                if ($item->Buyable() && $item->Buyable()->ClassName == 'TokenProduct') {
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -391,6 +382,79 @@ class ExportOrderExtension extends DataExtension
         }
 
         return '';
+    }
+
+    /**
+     * Find the price of an order item
+     *
+     * @param object $item The order item
+     * @param bool $export Whether or not the result is being used for the export functionality
+     * @return null|string
+     */
+    public function FindItemPrice($item, $export = false)
+    {
+        // If there is a Product
+        if ($item->Buyable()) {
+            // If the item is a TokenProduct
+            if ($item->Buyable()->ClassName == 'TokenProduct') {
+                // Get the live product object
+                $tokenProduct = TokenProduct::get_by_id('TokenProduct', $item->Buyable()->ID);
+                // If it's for the export function
+                if ($export) {
+                    // Add the FullPrice into the return string
+                    $price = $tokenProduct->FullPrice;
+                    // Otherwise it's for the summary fields
+                } else {
+                    // If the TokenStatus is 'Complete'
+                    if ($this->owner->TokenStatus == 'Complete') {
+                        // Add the FullPrice into the return string
+                        $price = $tokenProduct->FullPrice;
+                        // Otherwise the status is 'Deposit'
+                    } else {
+                        // Add the BasePrice into the return string
+                        $price = $tokenProduct->FullPrice;
+                    }
+                }
+                // Regular Product
+            } else {
+                // Add the FullPrice into the return string
+                $price = $item->Buyable()->BasePrice;
+            }
+
+            return number_format($price, 2);
+        }
+
+        return NULL;
+    }
+
+    /**
+     * Get the order items prices
+     *
+     * @param boolean $bExport Whether or not the result is being used for the export functionality
+     * @return null|string
+     */
+    public function ItemPrices($bExport = false) {
+        // If there are any order items
+        if (count($this->owner->Items())) {
+            // Get the items
+            $oItems = $this->owner->Items();
+            // Create the return string
+            $sPrices = '';
+            // Loop through the items
+            foreach ($oItems as $oItem) {
+                // Get the item price, and add it into the return string
+                $sPrices .= $this->owner->FindItemPrice($oItem, $bExport) . ',';
+            }
+            // If the last character is a comma
+            if (substr(trim($sPrices), -1) == ',') {
+                // Remove the last comma
+                $sPrices = substr($sPrices, 0, -1);
+            }
+
+            return $sPrices;
+        }
+
+        return NULL;
     }
 
     /**
@@ -539,8 +603,8 @@ class ExportOrderExtension extends DataExtension
                         // Deduct the total discount amount from the discounted item price
                         $sDiscountedItemPrice = ($sDiscountedItemPrice - $nDiscountAmountTotal);
                     }
-                    // Add the Order Item Discount Price into the return string
-                    $sDiscountedItemPrices .= $sDiscountedItemPrice . ',';
+                    // Add the formatted Order Item Discount Price into the return string
+                    $sDiscountedItemPrices .= number_format($sDiscountedItemPrice, 2) . ',';
                 }
             }
             /* END ITEM LOOP */
