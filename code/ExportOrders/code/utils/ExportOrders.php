@@ -127,10 +127,10 @@ class ExportOrders extends Object
                 // Increment the number of Orders
                 $iNumberOfExportedOrders++;
                 // Set the AutoExported status to 1
-//                if ($oOrder->Status == 'Paid') {
-//                    $oOrder->AutoExported = 1;
-//                    $oOrder->write();
-//                }
+                if ($oOrder->Status == 'Paid') {
+                    $oOrder->AutoExported = 1;
+                    $oOrder->write();
+                }
             }
         }
         // Close the file
