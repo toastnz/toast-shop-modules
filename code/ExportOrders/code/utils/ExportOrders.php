@@ -33,12 +33,14 @@ class ExportOrders extends Object
                 }
                 break;
         }
+        // MaKe upper case country code for email strings
+        $countryUpper = strtoupper($sCountry);
         // Get the SiteConfig for the Subsite
         $oSiteConfig = SiteConfig::get()->filter('SubsiteID', $iSubsiteID)->first();
         // Check that the container folder exists
         $this->checkFolders();
         // Set the path to the write file
-        $sOrdersFilePath = BASE_PATH . '/exported_data/BulletBrands_Orders_' . $sCountry . '.txt';
+        $sOrdersFilePath = BASE_PATH . '/exported_data/BulletBrands_Orders_' . $countryUpper . '.txt';
         // Open the file for writing
         $rOrdersFile = fopen($sOrdersFilePath, 'w');
         // Set the header row values
@@ -52,8 +54,8 @@ class ExportOrders extends Object
         // Set the email data body string
         $sEmailDataBody = '';
         // Set the email data heading string
-        $sEmailDataHeading = '<h2>BulletBrands ' . $sCountry . ' Orders Export Script</h2>';
-        $sEmailDataHeading .= '<div style="font-size:12px;">BulletBrands  ' . $sCountry . ' orders export script run: ' . $sScriptStartDate . '</div>';
+        $sEmailDataHeading = '<h2>BulletBrands ' . $countryUpper . ' Orders Export Script</h2>';
+        $sEmailDataHeading .= '<div style="font-size:12px;">BulletBrands  ' . $countryUpper . ' orders export script run: ' . $sScriptStartDate . '</div>';
         // Create an hr divider style
         $sTextHr = '<div style="border-bottom:1px dotted #ccc;font-size:1px;margin-bottom:10px;margin-top:10px;">&nbsp;</div>';
         // Add a divider
@@ -100,28 +102,28 @@ class ExportOrders extends Object
                 $sEmailDataBody .= $sTextHr;
                 // Make the CSV row
                 $sExportRow = "\"" .
-                              trim($sReference) . "\",\"" .
-                              trim($oDate) . "\",\"" .
-                              trim($sName) . "\",\"" .
-                              trim($sAddress1) . "\",\"" .
-                              trim($sAddress2) . "\",\"" .
-                              trim($sAddress3) . "\",\"" .
-                              trim($sAddress4) . "\",\"" .
-                              trim($sAddress5) . "\",\"" .
-                              trim($sAddress6) . "\",\"" .
-                              trim($sEmail) . "\",\"" .
-                              trim($sPhone) . "\",\"" .
-                              trim($sStockCodes) . "\",\"" .
-                              trim($sItemPrices) . "\",\"" .
-                              trim($sItemDiscountedPrices) . "\",\"" .
-                              trim($sItemsQty) . "\",\"" .
-                              trim($sDiscountCode) . "\",\"" .
-                              trim($sDiscountAmount) . "\",\"" .
-                              trim($sNotes) . "\",\"" .
-                              trim($sShippingTotal) . "\",\"" .
-                              trim($sTotal) . "\",\"" .
-                              trim($sStatus) . "\",\"" .
-                              trim($sTokenStatus) . "\"\r\n";
+                    trim($sReference) . "\",\"" .
+                    trim($oDate) . "\",\"" .
+                    trim($sName) . "\",\"" .
+                    trim($sAddress1) . "\",\"" .
+                    trim($sAddress2) . "\",\"" .
+                    trim($sAddress3) . "\",\"" .
+                    trim($sAddress4) . "\",\"" .
+                    trim($sAddress5) . "\",\"" .
+                    trim($sAddress6) . "\",\"" .
+                    trim($sEmail) . "\",\"" .
+                    trim($sPhone) . "\",\"" .
+                    trim($sStockCodes) . "\",\"" .
+                    trim($sItemPrices) . "\",\"" .
+                    trim($sItemDiscountedPrices) . "\",\"" .
+                    trim($sItemsQty) . "\",\"" .
+                    trim($sDiscountCode) . "\",\"" .
+                    trim($sDiscountAmount) . "\",\"" .
+                    trim($sNotes) . "\",\"" .
+                    trim($sShippingTotal) . "\",\"" .
+                    trim($sTotal) . "\",\"" .
+                    trim($sStatus) . "\",\"" .
+                    trim($sTokenStatus) . "\"\r\n";
                 // Write the text file data row
                 fwrite($rOrdersFile, $sExportRow);
                 // Increment the number of Orders
@@ -150,11 +152,11 @@ class ExportOrders extends Object
         // If there are new orders
         if ($iNumberOfExportedOrders && $oSiteConfig->ExportEmailFrom && $oSiteConfig->ExportEmailTo) {
             // Send email messages
-            $oEmail = new Email($oSiteConfig->ExportEmailFrom, $oSiteConfig->ExportEmailTo, 'BulletBrands ' . $sCountry . ' website: Order Export Status', $sEmailData);
+            $oEmail = new Email($oSiteConfig->ExportEmailFrom, $oSiteConfig->ExportEmailTo, 'BulletBrands ' . $countryUpper . ' website: Order Export Status', $sEmailData);
             // Set the file date
             $sFileDate = date('Ymdhis', time());
             // Attach the export CSVs
-            $oEmail->attachFile($sOrdersFilePath, 'BulletBrandsOrders_' . $sCountry . '_' . $sFileDate . '.csv');
+            $oEmail->attachFile($sOrdersFilePath, 'BulletBrandsOrders_' . $countryUpper . '_' . $sFileDate . '.csv');
             // CC the email
             if ($oSiteConfig->ExportEmailCC) {
                 $oEmail->bcc = $oSiteConfig->ExportEmailCC;

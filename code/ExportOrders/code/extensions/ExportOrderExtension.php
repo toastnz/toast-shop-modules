@@ -26,7 +26,7 @@ class ExportOrderExtension extends DataExtension
         'ItemDiscountedPrices' => 'Discounted Prices',
         'ItemsQty'      => 'Qty',
         'Discount'      => 'Discount',
-        'Notes'         => 'Delivery Instructions',
+//        'Notes'         => 'Delivery Instructions',
         'ShippingTotal' => 'Shipping',
         'Total'         => 'Total',
         'Status'        => 'Status',
