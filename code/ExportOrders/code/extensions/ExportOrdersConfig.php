@@ -31,17 +31,23 @@ class ExportOrdersConfig extends DataExtension
 
             $fields->findOrMakeTab('Root.Toast.Exports', 'Exports');
 
-            switch (Subsite::currentSubsiteID()) {
-                case '0':
-                default:
-                    $sOrderExportEmailFrom = (defined('DEFAULT_NZ_ORDER_EXPORT_EMAIL_FROM')) ? DEFAULT_NZ_ORDER_EXPORT_EMAIL_FROM : '';
-                    $sOrderExportEmailTo = (defined('DEFAULT_NZ_ORDER_EXPORT_EMAIL_TO')) ? DEFAULT_NZ_ORDER_EXPORT_EMAIL_TO : '';
-                    break;
-                case '1':
-                    $sOrderExportEmailFrom = (defined('DEFAULT_AUS_ORDER_EXPORT_EMAIL_FROM')) ? DEFAULT_AUS_ORDER_EXPORT_EMAIL_FROM : '';
-                    $sOrderExportEmailTo = (defined('DEFAULT_AUS_ORDER_EXPORT_EMAIL_TO')) ? DEFAULT_AUS_ORDER_EXPORT_EMAIL_TO : '';
-                    break;
+            $sOrderExportEmailFrom = Config::inst()->get('Email', 'admin_email');
+            $sOrderExportEmailTo = Config::inst()->get('Email', 'admin_email');
+
+            if (class_exists('Subsite')) {
+                switch (Subsite::currentSubsiteID()) {
+                    case '0':
+                    default:
+                        $sOrderExportEmailFrom = (defined('DEFAULT_NZ_ORDER_EXPORT_EMAIL_FROM')) ? DEFAULT_NZ_ORDER_EXPORT_EMAIL_FROM : $sOrderExportEmailFrom;
+                        $sOrderExportEmailTo = (defined('DEFAULT_NZ_ORDER_EXPORT_EMAIL_TO')) ? DEFAULT_NZ_ORDER_EXPORT_EMAIL_TO : $sOrderExportEmailTo;
+                        break;
+                    case '1':
+                        $sOrderExportEmailFrom = (defined('DEFAULT_AUS_ORDER_EXPORT_EMAIL_FROM')) ? DEFAULT_AUS_ORDER_EXPORT_EMAIL_FROM : $sOrderExportEmailFrom;
+                        $sOrderExportEmailTo = (defined('DEFAULT_AUS_ORDER_EXPORT_EMAIL_TO')) ? DEFAULT_AUS_ORDER_EXPORT_EMAIL_TO : $sOrderExportEmailTo;
+                        break;
+                }
             }
+
             // If the site is in dev mode
             if (!Director::isLive()) {
                 $sDefaultOrderExportEmailTo = (defined('DEFAULT_DEV_ORDER_EXPORT_EMAIL_TO')) ? DEFAULT_DEV_ORDER_EXPORT_EMAIL_TO : '';
