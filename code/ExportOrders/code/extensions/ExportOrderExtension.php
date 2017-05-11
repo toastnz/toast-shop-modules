@@ -10,27 +10,27 @@ class ExportOrderExtension extends DataExtension
     ];
 
     private static $summary_fields = [
-        'Reference'     => 'Order No',
-        'Placed'        => 'Date',
-        'Name'          => 'Customer',
-        'Address1'      => 'Address1',
-        'Address2'      => 'Address2',
-        'Address3'      => 'Address3',
-        'Address4'      => 'City',
-        'Address5'      => 'Postal Code',
-        'Address6'      => 'Country',
-        'Email'         => 'Email',
-        'Phone'         => 'Phone',
-        'StockCodes'    => 'Stock Codes',
-        'ItemPrices'    => 'Prices',
+        'Reference'            => 'Order No',
+        'Placed'               => 'Date',
+        'Name'                 => 'Customer',
+        'Address1'             => 'Address1',
+        'Address2'             => 'Address2',
+        'Address3'             => 'Address3',
+        'Address4'             => 'City',
+        'Address5'             => 'Postal Code',
+        'Address6'             => 'Country',
+        'Email'                => 'Email',
+        'Phone'                => 'Phone',
+        'StockCodes'           => 'Stock Codes',
+        'ItemPrices'           => 'Prices',
         'ItemDiscountedPrices' => 'Discounted Prices',
-        'ItemsQty'      => 'Qty',
-        'Discount'      => 'Discount',
-//        'Notes'         => 'Delivery Instructions',
-        'ShippingTotal' => 'Shipping',
-        'Total'         => 'Total',
-        'Status'        => 'Status',
-        'AutoExported'  => 'Auto Exported'
+        'ItemsQty'             => 'Qty',
+        'Discount'             => 'Discount',
+        //        'Notes'         => 'Delivery Instructions',
+        'ShippingTotal'        => 'Shipping',
+        'Total'                => 'Total',
+        'Status'               => 'Status',
+        'AutoExported'         => 'Auto Exported'
     ];
 
     public function updateSummaryFields(&$fields)
@@ -289,7 +289,8 @@ class ExportOrderExtension extends DataExtension
      *
      * @return mixed|number The concatenated value of all order items
      */
-    public function ExportTotal() {
+    public function ExportTotal()
+    {
         // If this is a Token payment order (it contains a Token product)
         if ($this->owner->getIsThisTokenPayment()) {
             // Set the return value
@@ -342,11 +343,12 @@ class ExportOrderExtension extends DataExtension
      *
      * @return string
      */
-    public function getDiscountCode() {
+    public function getDiscountCode()
+    {
         // If there are discounts applied
         if (count($this->owner->Discounts())) {
             // Set the discounts array
-            $aDiscountArray = array();
+            $aDiscountArray = [];
             // Get the discounts
             $oDiscounts = $this->owner->Discounts();
             // Loop through the discounts
@@ -372,7 +374,8 @@ class ExportOrderExtension extends DataExtension
      *
      * @return string The discounted amount for this order
      */
-    public function getDiscountAmount() {
+    public function getDiscountAmount()
+    {
         // If there are any Discounts for this Order
         if (count($this->owner->Discounts())) {
             // Get the Discount Total
@@ -387,8 +390,8 @@ class ExportOrderExtension extends DataExtension
     /**
      * Find the price of an order item
      *
-     * @param object $item The order item
-     * @param bool $export Whether or not the result is being used for the export functionality
+     * @param object $item   The order item
+     * @param bool   $export Whether or not the result is being used for the export functionality
      * @return null|string
      */
     public function FindItemPrice($item, $export = false)
@@ -424,7 +427,7 @@ class ExportOrderExtension extends DataExtension
             return number_format($price, 2);
         }
 
-        return NULL;
+        return null;
     }
 
     /**
@@ -433,7 +436,8 @@ class ExportOrderExtension extends DataExtension
      * @param boolean $bExport Whether or not the result is being used for the export functionality
      * @return null|string
      */
-    public function ItemPrices($bExport = false) {
+    public function ItemPrices($bExport = false)
+    {
         // If there are any order items
         if (count($this->owner->Items())) {
             // Get the items
@@ -454,7 +458,7 @@ class ExportOrderExtension extends DataExtension
             return $sPrices;
         }
 
-        return NULL;
+        return null;
     }
 
     /**
@@ -463,7 +467,8 @@ class ExportOrderExtension extends DataExtension
      * @param boolean $bExport Whether or not the result is being used for the export functionality
      * @return null|string
      */
-    public function ItemDiscountedPrices($bExport = false) {
+    public function ItemDiscountedPrices($bExport = false)
+    {
         // Set the max execution time
         ini_set('max_execution_time', 0);
         // Create the return string
@@ -488,7 +493,7 @@ class ExportOrderExtension extends DataExtension
                     }
                     // Set the default Discount and Amount vars to zero
                     $nDiscountPercentTotal = 0;
-                    $nDiscountAmountTotal = 0;
+                    $nDiscountAmountTotal  = 0;
                     // Set the default discount item price to the item price
                     $sDiscountedItemPrice = $sItemPrice;
                     /*
@@ -624,25 +629,31 @@ class ExportOrderExtension extends DataExtension
      *
      * @return int|mixed|string
      */
-    public function getReference() {
+    public function getReference()
+    {
         $reference = $this->owner->getField('Reference') ? $this->owner->getField('Reference') : $this->owner->ID;
+        $prefix    = Config::inst()->get('Order', 'reference_prefix') ? : '';
 
-        if (strpos($reference, 'BB') === false) {
-            $reference = 'BB' . $reference;
-        }
+        if ($prefix) {
+            if (strpos($reference, $prefix) === false) {
+                $reference = $prefix . $reference;
+            }
 
-        if ($reference == 'BB0') {
-            $reference = 'BB' . $this->owner->ID;
+            if ($reference == $prefix . '0') {
+                $reference = $prefix . $this->owner->ID;
+            }
         }
 
         return $reference;
     }
 
-    public function getReferenceForCart() {
+    public function getReferenceForCart()
+    {
         return $this->getReference();
     }
 
-    public function Reference() {
+    public function Reference()
+    {
         return $this->getReference();
     }
 

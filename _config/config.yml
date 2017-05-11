@@ -15,3 +15,5 @@ OrdersAdmin:
 ToastCheckoutComponentConfig:
   formfielddescriptions: false
 
+Order:
+  reference_prefix: ''

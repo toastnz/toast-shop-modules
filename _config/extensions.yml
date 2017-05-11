@@ -7,7 +7,6 @@ SiteConfig:
     - ToastConfig
     - AbandonedCartConfig
     - SignUpModalConfig
-    - CheckoutStepConfig
     - ExportOrdersConfig
 Order:
   extensions:
@@ -18,10 +17,6 @@ Order:
 OrdersAdmin:
   extensions:
     - ToastOrdersAdmin
-
-CheckoutComponent:
-  extensions:
-    - ToastCheckoutComponentExtension
 
 Address:
   extensions:

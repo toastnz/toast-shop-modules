@@ -19,10 +19,9 @@ class AccessoriesCheckoutComponent extends CheckoutComponent
         $fields = FieldList::create();
 
         if ($order->getRelatedProducts() && $order->getRelatedProducts()->exists()) {
-            $component = CheckoutStepObject::get()->filter(['Type' => 'Accessories'])->first();
 
             $fields->push(LiteralField::create('Accessories',
-                $component->renderWith('AccessoriesCheckoutComponent')->forTemplate()
+                $order->renderWith('AccessoriesCheckoutComponent')->forTemplate()
             ));
         }
 
