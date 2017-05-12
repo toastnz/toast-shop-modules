@@ -30,10 +30,10 @@ Product:
   extensions:
     - ToastProductExtension
 
-PaymentCheckoutComponent:
-  extensions:
-    - ToastPaymentComponentExtension
-
 Page_Controller:
   extensions:
     - EcommerceDataLayer
+
+CheckoutPage_Controller:
+  extensions:
+    - CheckoutStepsControllerExtension

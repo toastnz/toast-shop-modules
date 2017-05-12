@@ -20,6 +20,9 @@
                     <% include CartSummary %>
                     <% include PromoCode %>
                 <% end_with %>
+
+                $StepBlocks
+
                 $OrderForm
             <% else %>
                 <p class="message warning"><%t ShoppingCart.NoItems "There are no items in your cart." %></p>

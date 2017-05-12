@@ -1,6 +1,6 @@
 ---
 Name: toastconfig
-After: 'framework/*','cms/*'
+After: 'framework/*','cms/*','shoproutes/*','shopconfig/*'
 ---
 Injector:
   CheckoutComponentConfig:
