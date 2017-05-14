@@ -10,10 +10,21 @@ class CheckoutStep_Accessories extends CheckoutStep
     public function accessories()
     {
         $form = $this->AccessoriesForm();
-
-        return [
+        $data = [
             'OrderForm' => $form,
         ];
+
+        if (Director::is_ajax()) {
+            return $this->owner->customise(
+                [
+                    'OrderForm' => $form,
+                ]
+            )->renderWith(
+                ["CheckoutStep"]
+            );
+        }
+
+        return $data;
     }
 
     public function AccessoriesForm()

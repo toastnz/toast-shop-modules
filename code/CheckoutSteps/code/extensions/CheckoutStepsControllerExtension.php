@@ -1,12 +1,15 @@
 <?php
+use SilverStripe\Omnipay\GatewayInfo;
 
 /**
  * Class CheckoutStepsControllerExtension
+ *
+ * @property CheckoutPage_Controller $owner
  */
 class CheckoutStepsControllerExtension extends Extension
 {
-    /** @var CheckoutPage_Controller */
-    protected $owner;
+//    protected $owner;
+
 
     public function getStepBlocks()
     {
@@ -30,6 +33,94 @@ class CheckoutStepsControllerExtension extends Extension
         return $this->owner->renderWith('CheckoutSteps', ['Steps' => $list])->forTemplate();
     }
 
+    public function shippingaddress()
+    {
+        $form = $this->owner->ShippingAddressForm();
+        $form->Fields()->push(
+            CheckboxField::create(
+                "SeperateBilling",
+                _t('CheckoutStep_Address.SeperateBilling', "Bill to a different address from this")
+            )
+        );
+        $order = $this->owner->shippingconfig()->getOrder();
+        if ($order->BillingAddressID !== $order->ShippingAddressID) {
+            $form->loadDataFrom(["SeperateBilling" => 1]);
+        }
+
+        if (Director::is_ajax()) {
+            return $this->owner->renderWith('CheckoutStep', ['OrderForm' => $form]);
+        }
+        return array('OrderForm' => $form);
+    }
+
+    public function billingaddress()
+    {
+        $data = ['OrderForm' => $this->owner->BillingAddressForm()];
+        if (Director::is_ajax()) {
+            return $this->owner->renderWith('CheckoutStep', $data);
+        }
+        return $data;
+    }
+
+    public function paymentmethod()
+    {
+        $gateways = GatewayInfo::getSupportedGateways();
+        if (count($gateways) == 1) {
+            return $this->owner->redirect($this->owner->NextStepLink());
+        }
+        $data = [
+            'OrderForm' => $this->owner->PaymentMethodForm(),
+        ];
+        if (Director::is_ajax()) {
+            return $this->owner->renderWith('CheckoutStep', $data);
+        }
+        return $data;
+    }
+
+    public function contactdetails()
+    {
+        $form = $this->owner->ContactDetailsForm();
+        if (
+            ShoppingCart::curr()
+            && Config::inst()->get("CheckoutStep_ContactDetails", "skip_if_logged_in")
+        ) {
+            if (Member::currentUser()) {
+                if (!$form->getValidator()->validate()) {
+                    return Controller::curr()->redirect($this->owner->NextStepLink());
+                } else {
+                    $form->clearMessage();
+                }
+            }
+        }
+
+        $data = [
+            'OrderForm' => $form,
+        ];
+
+        if (Director::is_ajax()) {
+            return $this->owner->renderWith('CheckoutStep', $data);
+        }
+
+        return $data;
+    }
+
+    public function membership()
+    {
+        //if logged in, then redirect to next step
+        if (ShoppingCart::curr() && CheckoutStep_Membership::$skip_if_logged_in && Member::currentUser()) {
+            Controller::curr()->redirect($this->owner->NextStepLink());
+            return;
+        }
+        return $this->owner->customise(
+            array(
+                'Form'      => $this->owner->MembershipForm(),
+                'LoginForm' => $this->owner->LoginForm(),
+                'GuestLink' => $this->owner->NextStepLink(),
+            )
+        )->renderWith(
+            array("CheckoutPage_membership")
+        ); //needed to make rendering work on index
+    }
 
     public function index(SS_HTTPRequest $request)
     {
