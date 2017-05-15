@@ -5,6 +5,8 @@ use SilverStripe\Omnipay\GatewayInfo;
  * Class CheckoutStepsControllerExtension
  *
  * @property CheckoutPage_Controller $owner
+ *
+ * @todo find all-encompassing override for ajax renderWith responses
  */
 class CheckoutStepsControllerExtension extends Extension
 {
@@ -24,9 +26,9 @@ class CheckoutStepsControllerExtension extends Extension
                 }
             }
             $list->push(ArrayData::create([
-                'Title' => $step,
+                'Title'     => $step,
                 'IsCurrent' => $this->owner->IsCurrentStep($step),
-                'Link' => Controller::join_links(Director::absoluteBaseURL(), CheckoutPage::find_link(), $step)
+                'Link'      => Controller::join_links(Director::absoluteBaseURL(), CheckoutPage::find_link(), $step)
             ]));
         }
 
@@ -50,7 +52,7 @@ class CheckoutStepsControllerExtension extends Extension
         if (Director::is_ajax()) {
             return $this->owner->renderWith('CheckoutStep', ['OrderForm' => $form]);
         }
-        return array('OrderForm' => $form);
+        return ['OrderForm' => $form];
     }
 
     public function billingaddress()
@@ -111,21 +113,34 @@ class CheckoutStepsControllerExtension extends Extension
             Controller::curr()->redirect($this->owner->NextStepLink());
             return;
         }
-        return $this->owner->customise(
-            array(
-                'Form'      => $this->owner->MembershipForm(),
-                'LoginForm' => $this->owner->LoginForm(),
-                'GuestLink' => $this->owner->NextStepLink(),
-            )
-        )->renderWith(
-            array("CheckoutPage_membership")
-        ); //needed to make rendering work on index
+
+        $data = [
+            'Form'      => $this->owner->MembershipForm(),
+            'LoginForm' => $this->owner->LoginForm(),
+            'GuestLink' => $this->owner->NextStepLink(),
+        ];
+
+        if (Director::is_ajax()) {
+            return $this->owner->customise(
+                $data
+            )->renderWith(
+                ["CheckoutPage_membership"]
+            ); //needed to make rendering work on index
+        } else {
+            return $this->owner->customise(
+                $data
+            )->renderWith(
+                ["CheckoutPage_membership", "CheckoutPage", "Page"]
+            ); //needed to make rendering work on index
+        }
+
+
     }
 
     public function index(SS_HTTPRequest $request)
     {
         if (Director::is_ajax()) {
-            $steps = CheckoutPage::config()->steps;
+            $steps  = CheckoutPage::config()->steps;
             $action = $request->param('Action');
 
             if (CheckoutPage::config()->first_step && !$action) {
@@ -134,7 +149,7 @@ class CheckoutStepsControllerExtension extends Extension
 
             if (in_array($action, $steps)) {
                 $className = $steps[$action];
-                $data = singleton($className)->{$action}();
+                $data      = singleton($className)->{$action}();
                 return $this->owner->renderWith('CheckoutStep', $data);
             }
         }

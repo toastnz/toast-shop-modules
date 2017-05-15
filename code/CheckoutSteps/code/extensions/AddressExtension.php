@@ -52,7 +52,7 @@ class ToastAddressExtension extends DataExtension
                 // Populate values with name / email
                 $additionalFields->setValues([
                     'FirstName' => $signUp->Name,
-                    'Email' => $signUp->Email,
+                    'Email'     => $signUp->Email,
                 ]);
             }
         }
@@ -91,9 +91,9 @@ class ToastAddressExtension extends DataExtension
     {
         $additionalFields = [
             'FirstName' => 'First Name',
-            'Surname' => 'Surname',
-            'Email' => 'Email',
-            'Phone' => 'Phone'
+            'Surname'   => 'Surname',
+            'Email'     => 'Email',
+            'Phone'     => 'Phone'
         ];
 
         array_merge($fields, $additionalFields);
