@@ -7,6 +7,17 @@
  */
 class ToastOrderExtension extends DataExtension
 {
+    public function updateCMSFields(FieldList $fields)
+    {
+        // Add the Payments
+        $config = GridFieldConfig_RelationEditor::create(50);
+        $config->removeComponentsByType('GridFieldAddExistingAutoCompleter');
+        $config->removeComponentsByType('GridFieldAddNewButton');
+        $gridField = GridField::create('Payments', 'Payments', $this->owner->Payments(), $config);
+        $fields->addFieldsToTab('Root.Main', [$gridField]);
+
+    }
+
     public function getRelatedProducts()
     {
         /** =========================================
