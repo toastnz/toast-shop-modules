@@ -28,6 +28,7 @@ class CheckoutStepsControllerExtension extends Extension
             $list->push(ArrayData::create([
                 'Title'     => $step,
                 'IsCurrent' => $this->owner->IsCurrentStep($step),
+                'Pos'       => $this->actionPos($step),
                 'Link'      => Controller::join_links(Director::absoluteBaseURL(), CheckoutPage::find_link(), $step)
             ]));
         }
@@ -158,5 +159,17 @@ class CheckoutStepsControllerExtension extends Extension
             return $this->owner->{CheckoutPage::config()->first_step}();
         }
         return [];
+    }
+
+    private function actionPos($incoming)
+    {
+        $count = 0;
+        foreach ($this->owner->getSteps() as $action => $step) {
+            if ($action == $incoming) {
+                return $count;
+            }
+            $count++;
+        }
+        return $count;
     }
 }
