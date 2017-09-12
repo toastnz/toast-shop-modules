@@ -187,6 +187,21 @@ class AbandonedCartTask implements CronTask
                 $products[] = $orderItem->TableTitle();
             }
             $data['IntroContent'] = str_replace('[cart_items]', implode(', ', $products), $data['IntroContent']);
+
+            // Check subsite of order
+            if ($order->ShippingAddress()) {
+                $countryCode = $order->ShippingAddress()->Country;
+                if ($countryCode == 'AU') {
+                    // Get the subsite so we can get the right link
+                    $subsite = Subsite::get()->filter('CountryCode', 'aus')->first();
+                    if ($subsite && $subsite->exists()) {
+                        $cartPage = CartPage::get()->filter('SubsiteID', $subsite->ID)->first();
+                        if ($cartPage && $cartPage->exists()) {
+                            $data['CartLink'] = $cartPage->AbsoluteLink();
+                        }
+                    }
+                }
+            }
         }
 
         $email->setTemplate('AbandonedCartEmail')
