@@ -114,6 +114,32 @@ class SignUpForm extends Form
         // Save data to session
         Session::set('FormInfo.Form_' . $this->name . '.data', $data);
 
+
+        $siteConfig = SiteConfig::current_site_config();
+
+        /** Get the list id */
+        $listID = $siteConfig->MailChimpListID;
+        $result = [];
+
+        /** Check if the API key, and List ID have been set. */
+        if ($siteConfig->MailChimpAPI && $listID) {
+            $mailChimp = new \Drewm\MailChimp($siteConfig->MailChimpAPI);
+
+            // create merge vars
+            $mergeVars = [];
+
+            $mergeVars['FNAME'] = $data['Name'];
+
+            $result = $mailChimp->call('lists/subscribe', [
+                'id'         => $listID,
+                'email'      => [
+                    'email' => $data['Email']
+                ],
+                'merge_vars' => $mergeVars
+            ]);
+
+        }
+
         if (isset($data['Email']) && $data['Email'] != '') {
             if ($this->request->isAjax()) {
                 $data = array(
