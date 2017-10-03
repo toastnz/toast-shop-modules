@@ -645,14 +645,16 @@ class ExportOrderExtension extends DataExtension
      */
     public function getReference()
     {
+        $prefix = Config::inst()->get('ToastConfig', 'reference_prefix') ? : 'BB';
+
         $reference = $this->owner->getField('Reference') ? $this->owner->getField('Reference') : $this->owner->ID;
 
-        if (strpos($reference, 'BB') === false) {
-            $reference = 'BB' . $reference;
+        if (strpos($reference, $prefix) === false) {
+            $reference = $prefix . $reference;
         }
 
-        if ($reference == 'BB0') {
-            $reference = 'BB' . $this->owner->ID;
+        if ($reference == $prefix . '0') {
+            $reference = $prefix . $this->owner->ID;
         }
 
         return $reference;
