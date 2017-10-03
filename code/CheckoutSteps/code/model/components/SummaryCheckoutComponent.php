@@ -42,6 +42,11 @@ class SummaryCheckoutComponent extends CheckoutComponent
     {
     }
 
+    public function getExtraClasses()
+    {
+        return 'js-cart-summary-updateable';
+    }
+
     public function getRequiredFields(Order $order)
     {
         $fields = parent::getRequiredFields($order);

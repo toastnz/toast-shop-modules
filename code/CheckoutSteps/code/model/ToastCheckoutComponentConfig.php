@@ -100,7 +100,10 @@ class ToastCheckoutComponentConfig extends CheckoutComponentConfig
                          * Wrapper
                          * ----------------------------------------*/
 
-                        $cfields->unshift(LiteralField::create($cname . 'Wrapper', '<div id="' . $cname . '_wrapper" class="checkout-component" data-api-url="' . ShopAPIConfig::getApiUrl() . '/component/' . str_replace('CheckoutComponent', '', $cname) . '">'));
+                        // Get extra classes
+                        $extraClasses = $component->Proxy()->getExtraClasses();
+
+                        $cfields->unshift(LiteralField::create($cname . 'Wrapper', '<div id="' . $cname . '_wrapper"  class="checkout-component ' . $extraClasses . '" data-api-url="' . ShopAPIConfig::getApiUrl() . '/component/' . str_replace('CheckoutComponent', '', $cname) . '">'));
 
                         /** -----------------------------------------
                          * Component-specific Options

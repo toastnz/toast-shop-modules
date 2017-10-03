@@ -15,4 +15,16 @@ class ToastCheckoutComponentExtension extends Extension
 
         return $fields;
     }
+
+    /**
+     * @return string
+     */
+    public function getExtraClasses()
+    {
+        $extraClasses = $this->owner->Name();
+
+        $this->owner->extend('updateExtraClasses', $extraClasses);
+
+        return $extraClasses;
+    }
 }
