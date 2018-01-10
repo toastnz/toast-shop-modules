@@ -2,6 +2,8 @@
 
 /**
  * Class ExportOrderExtension
+ *
+ * @property Order $owner
  */
 class ExportOrderExtension extends DataExtension
 {
@@ -463,7 +465,40 @@ class ExportOrderExtension extends DataExtension
      * @param boolean $bExport Whether or not the result is being used for the export functionality
      * @return null|string
      */
-    public function ItemDiscountedPrices($bExport = false) {
+    public function ItemDiscountedPrices($bExport = false)
+    {
+
+        // Get the items
+        $items = $this->owner->Items();
+
+        $itemDiscounts = [];
+        $usePerItem = false;
+
+        /** @var OrderItem|DiscountedOrderItem $item */
+        foreach ($items as $item) {
+
+            $itemSavings = OrderAttribute::get()
+                ->innerJoin("Product_OrderItem_Discounts", "\"OrderAttribute\".\"ID\" = \"Product_OrderItem_Discounts\".\"Product_OrderItemID\"")
+                ->filter("Product_OrderItem_Discounts.Product_OrderItemID", $item->ID)
+                ->filter("OrderAttribute.OrderID", $this->owner->ID)
+                ->sum("DiscountAmount");
+
+            if (!empty($itemSavings)) {
+                $usePerItem = true;
+                $itemDiscounts[] =  $item->UnitPrice() - $itemSavings;
+
+            } else {
+                $itemDiscounts[] = $item->UnitPrice();
+            }
+
+        }
+
+        if ($usePerItem) {
+            array_filter($itemDiscounts);
+
+            return implode(',', $itemDiscounts);
+        }
+
         // Set the max execution time
         ini_set('max_execution_time', 0);
         // Create the return string
