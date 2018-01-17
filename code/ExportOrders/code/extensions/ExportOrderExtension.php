@@ -2,6 +2,8 @@
 
 /**
  * Class ExportOrderExtension
+ *
+ * @property Order $owner
  */
 class ExportOrderExtension extends DataExtension
 {
@@ -26,7 +28,7 @@ class ExportOrderExtension extends DataExtension
         'ItemDiscountedPrices' => 'Discounted Prices',
         'ItemsQty'      => 'Qty',
         'Discount'      => 'Discount',
-//        'Notes'         => 'Delivery Instructions',
+        'Notes'         => 'Delivery Instructions',
         'ShippingTotal' => 'Shipping',
         'Total'         => 'Total',
         'Status'        => 'Status',
@@ -55,17 +57,6 @@ class ExportOrderExtension extends DataExtension
         ]
     ];
 
-
-    public function updateCMSFields(FieldList $fields)
-    {
-        // Add the AutoExported selection field
-        $autoExported = DropdownField::create('AutoExported', 'Auto Exported', [
-            0 => 'No',
-            1 => 'Yes'
-        ]);
-        $fields->insertAfter($autoExported, 'Status');
-
-    }
 
     /**
      * Get Address line 1
@@ -300,8 +291,7 @@ class ExportOrderExtension extends DataExtension
      *
      * @return mixed|number The concatenated value of all order items
      */
-    public function ExportTotal()
-    {
+    public function ExportTotal() {
         // If this is a Token payment order (it contains a Token product)
         if ($this->owner->getIsThisTokenPayment()) {
             // Set the return value
@@ -354,12 +344,11 @@ class ExportOrderExtension extends DataExtension
      *
      * @return string
      */
-    public function getDiscountCode()
-    {
+    public function getDiscountCode() {
         // If there are discounts applied
         if (count($this->owner->Discounts())) {
             // Set the discounts array
-            $aDiscountArray = [];
+            $aDiscountArray = array();
             // Get the discounts
             $oDiscounts = $this->owner->Discounts();
             // Loop through the discounts
@@ -385,8 +374,7 @@ class ExportOrderExtension extends DataExtension
      *
      * @return string The discounted amount for this order
      */
-    public function getDiscountAmount()
-    {
+    public function getDiscountAmount() {
         // If there are any Discounts for this Order
         if (count($this->owner->Discounts())) {
             // Get the Discount Total
@@ -447,8 +435,7 @@ class ExportOrderExtension extends DataExtension
      * @param boolean $bExport Whether or not the result is being used for the export functionality
      * @return null|string
      */
-    public function ItemPrices($bExport = false)
-    {
+    public function ItemPrices($bExport = false) {
         // If there are any order items
         if (count($this->owner->Items())) {
             // Get the items
@@ -458,10 +445,7 @@ class ExportOrderExtension extends DataExtension
             // Loop through the items
             foreach ($oItems as $oItem) {
                 // Get the item price, and add it into the return string
-                if ($this->owner->FindItemPrice($oItem, $bExport)) {
-                    $sPrices .= $this->owner->FindItemPrice($oItem, $bExport) . ',';
-                }
-
+                $sPrices .= $this->owner->FindItemPrice($oItem, $bExport) . ',';
             }
             // If the last character is a comma
             if (substr(trim($sPrices), -1) == ',') {
@@ -483,6 +467,38 @@ class ExportOrderExtension extends DataExtension
      */
     public function ItemDiscountedPrices($bExport = false)
     {
+
+        // Get the items
+        $items = $this->owner->Items();
+
+        $itemDiscounts = [];
+        $usePerItem = false;
+
+        /** @var OrderItem|DiscountedOrderItem $item */
+        foreach ($items as $item) {
+
+            $itemSavings = OrderAttribute::get()
+                ->innerJoin("Product_OrderItem_Discounts", "\"OrderAttribute\".\"ID\" = \"Product_OrderItem_Discounts\".\"Product_OrderItemID\"")
+                ->filter("Product_OrderItem_Discounts.Product_OrderItemID", $item->ID)
+                ->filter("OrderAttribute.OrderID", $this->owner->ID)
+                ->sum("DiscountAmount");
+
+            if (!empty($itemSavings)) {
+                $usePerItem = true;
+                $itemDiscounts[] =  $item->UnitPrice() - $itemSavings;
+
+            } else {
+                $itemDiscounts[] = $item->UnitPrice();
+            }
+
+        }
+
+        if ($usePerItem) {
+            array_filter($itemDiscounts);
+
+            return implode(',', $itemDiscounts);
+        }
+
         // Set the max execution time
         ini_set('max_execution_time', 0);
         // Create the return string
@@ -643,30 +659,25 @@ class ExportOrderExtension extends DataExtension
      *
      * @return int|mixed|string
      */
-    public function getReference()
-    {
-        $prefix = Config::inst()->get('ToastConfig', 'reference_prefix') ? : 'BB';
-
+    public function getReference() {
         $reference = $this->owner->getField('Reference') ? $this->owner->getField('Reference') : $this->owner->ID;
 
-        if (strpos($reference, $prefix) === false) {
-            $reference = $prefix . $reference;
+        if (strpos($reference, 'BB') === false) {
+            $reference = 'BB' . $reference;
         }
 
-        if ($reference == $prefix . '0') {
-            $reference = $prefix . $this->owner->ID;
+        if ($reference == 'BB0') {
+            $reference = 'BB' . $this->owner->ID;
         }
 
         return $reference;
     }
 
-    public function getReferenceForCart()
-    {
+    public function getReferenceForCart() {
         return $this->getReference();
     }
 
-    public function Reference()
-    {
+    public function Reference() {
         return $this->getReference();
     }
 
