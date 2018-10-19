@@ -105,6 +105,18 @@ class ToastOrderExtension extends DataExtension
         parent::onAfterWrite();
 
         /** -----------------------------------------
+         * MOD : colin@toast.co.nz : 19 October 2018
+         * Temp fix for incorrect outstanding amount (due to buggy discount coupons),
+         * which sets the order status to "Unpaid", and prevents the order from being exported
+         * to the warehouse.
+         * ----------------------------------------*/
+
+        if ($this->owner->Status == 'Unpaid' && !$this->owner->getIsThisTokenPayment()) {
+            $this->owner->Status = 'Paid';
+            $this->owner->write();
+        }
+
+        /** -----------------------------------------
          * Clear Abandoned Cart
          * ----------------------------------------*/
 
