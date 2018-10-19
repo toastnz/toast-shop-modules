@@ -10,12 +10,13 @@ class ExportOrders extends Object
      * @throws ValidationException
      * @throws null
      */
-    public function process($mRegion = false) {
+    public function process($mRegion = false)
+    {
         if (class_exists('Subsite')) {
             // Temp disable the Subsite filter
             Subsite::disable_subsite_filter();
             // Get the country value
-            $sCountry = ($mRegion) ? $mRegion : 'nz' ;
+            $sCountry = ($mRegion) ? $mRegion : 'nz';
             // Set the default Subsite ID
             $iSubsiteID = 0;
             $countryCode = 'nz';
@@ -63,12 +64,44 @@ class ExportOrders extends Object
             $sEmailDataBody .= $sTextHr;
             // Set the default number of exported orders to zero
             $iNumberOfExportedOrders = 0;
-            // Get the Order records that have not been auto-exported
-            $oOrders = Order::get()->filter(array(
-                'AutoExported' => 0,
-                'Status' => 'Paid',
+
+
+            /*
+             * MOD : colin@toast.co.nz : 19 October 2018
+             * Temp fix for incorrect outstanding amount (due to buggy discount coupons),
+             * which sets the order status to "Unpaid", and prevents the order from being exported
+             * to the warehouse.
+             * ----------------------------------------------------------------------------------------
+             */
+            // Get all orders with status Unpaid, that have not been exported.
+            $orders = Order::get()->filter([
+                'AutoExported'            => 0,
+                'Status'                  => 'Unpaid',
                 'ShippingAddress.Country' => $countryCode
-            ))->limit(1000);
+            ])->limit(1000);
+
+            // If there are any
+            if ($orders->exists()) {
+                foreach ($orders as $order) {
+                    // Make sure the order is not using Token payments
+                    if (!$order->getIsThisTokenPayment()) {
+                        // Set the order Status to paid
+                        $order->Status = 'Paid';
+                        $order->write();
+                    }
+                }
+            }
+            /*
+             * ----------------------------------------------------------------------------------------
+             */
+
+
+            // Get the Order records that have not been auto-exported
+            $oOrders = Order::get()->filter([
+                'AutoExported'            => 0,
+                'Status'                  => 'Paid',
+                'ShippingAddress.Country' => $countryCode
+            ])->limit(1000);
             // If there are any
             if ($oOrders->exists()) {
                 // Loop through the Orders
@@ -143,7 +176,7 @@ class ExportOrders extends Object
             // Add the execution time to the heading
             $tFinishTime = time() - $tScriptStartTime;
 
-    //        echo "End: " . date('H:i a, D d M Y ', time());
+            //        echo "End: " . date('H:i a, D d M Y ', time());
 
             $sEmailDataHeading .= '<div style="font-size:12px;">Execution Time: ' . date('i', $tFinishTime) . ' minutes ' . date('s', $tFinishTime) . ' seconds</div>';
             // Set the email data content
@@ -173,10 +206,11 @@ class ExportOrders extends Object
         return true;
     }
 
-    public function checkFolders() {
-        $arrFolder = array(
+    public function checkFolders()
+    {
+        $arrFolder = [
             BASE_PATH . '/exported_data/'
-        );
+        ];
 
         foreach ($arrFolder as $folder) {
             if (!file_exists($folder)) {
