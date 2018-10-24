@@ -83,8 +83,12 @@ class ExportOrders extends Object
             // If there are any
             if ($orders->exists()) {
                 foreach ($orders as $order) {
-                    // Make sure the order is not using Token payments
-                    if (!$order->getIsThisTokenPayment()) {
+
+                    // Get the status of the last payment
+                    $lastPaymentStatus = $order->payments()->sort('Created')->last()->Status;
+
+                    // Make sure the order is not using Token payments, and that the card payment has been captured
+                    if (!$order->getIsThisTokenPayment() && $lastPaymentStatus == 'Captured') {
                         // Set the order Status to paid
                         $order->Status = 'Paid';
                         $order->write();

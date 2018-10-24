@@ -111,7 +111,11 @@ class ToastOrderExtension extends DataExtension
          * to the warehouse.
          * ----------------------------------------*/
 
-        if ($this->owner->Status == 'Unpaid' && !$this->owner->getIsThisTokenPayment()) {
+        // Get the status of the last payment
+        $lastPaymentStatus = $this->owner->payments()->sort('Created')->last()->Status;
+
+        // Make sure the order is not using Token payments, and that the card payment has been captured
+        if ($this->owner->Status == 'Unpaid' && !$this->owner->getIsThisTokenPayment() && $lastPaymentStatus == 'Captured') {
             $this->owner->Status = 'Paid';
             $this->owner->write();
         }
